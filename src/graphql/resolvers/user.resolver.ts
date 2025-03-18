@@ -4,6 +4,8 @@ import { UserEntity } from '../../entities/user.entity';
 import { ReservationType } from './reservation.resolver';
 import { UserService } from '../services/user.service';
 import { Observable } from 'rxjs';
+import { UseGuards } from '@nestjs/common';
+import { GqlAuthGuard } from '../../auth/gq-auth.guard';
 
 @ObjectType()
 export class accessTokenType {
@@ -26,6 +28,7 @@ export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
   @Query(() => [UserType])
+  @UseGuards(GqlAuthGuard)
   listUsers(
     @Args('skip') skip: number,
     @Args('limit') limit: number,
@@ -34,6 +37,7 @@ export class UserResolver {
   }
 
   @Query(() => UserType, { nullable: true })
+  @UseGuards(GqlAuthGuard)
   room(@Args('id') id: string): Observable<UserEntity> {
     return this.userService.user(id);
   }

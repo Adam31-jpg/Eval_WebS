@@ -8,9 +8,13 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { GraphQLAppModule } from './graphql/graphql.module';
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
+    AuthModule,
     GraphQLAppModule,
     TypeOrmModule.forRoot({
       type: 'postgres',

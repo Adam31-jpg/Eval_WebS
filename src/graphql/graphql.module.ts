@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ReservationService } from './services/reservation.service';
 import { UserService } from './services/user.service';
 import { RoomService } from './services/room.service';
@@ -11,9 +11,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ReservationEntity } from '../entities/reservation.entity';
 import { RoomEntity } from '../entities/room.entity';
 import { UserEntity } from '../entities/user.entity';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
+    forwardRef(() => AuthModule),
     HttpModule,
     TypeOrmModule.forFeature([
       NotificationEntity,
@@ -31,5 +33,6 @@ import { UserEntity } from '../entities/user.entity';
     UserResolver,
     RoomResolver,
   ],
+  exports: [UserService],
 })
 export class GraphQLAppModule {}

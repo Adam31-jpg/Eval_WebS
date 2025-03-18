@@ -15,6 +15,8 @@ import { UserType } from './user.resolver';
 import { Observable } from 'rxjs';
 import { CreateReservationInput } from './dto/create-reservation.input';
 import { ReservationService } from '../services/reservation.service';
+import { UseGuards } from '@nestjs/common';
+import { GqlAuthGuard } from '../../auth/gq-auth.guard';
 
 @ObjectType()
 export class ReservationType {
@@ -39,6 +41,7 @@ export class ReservationResolver {
   constructor(private readonly reservationService: ReservationService) {}
 
   @Query(() => [ReservationType])
+  @UseGuards(GqlAuthGuard)
   listReservations(
     @Args('skip') skip: number,
     @Args('limit') limit: number,
@@ -47,11 +50,13 @@ export class ReservationResolver {
   }
 
   @Query(() => ReservationType, { nullable: true })
+  @UseGuards(GqlAuthGuard)
   room(@Args('id') id: string): Observable<ReservationEntity> {
     return this.reservationService.reservation(id);
   }
 
   @Mutation(() => ReservationType)
+  @UseGuards(GqlAuthGuard)
   createReservation(
     @Args('input') input: CreateReservationInput,
   ): Observable<ReservationEntity> {
@@ -59,6 +64,7 @@ export class ReservationResolver {
   }
 
   @Mutation(() => RoomType)
+  @UseGuards(GqlAuthGuard)
   updateRoom(
     @Args('id') id: string,
     @Args('input') input: CreateReservationInput,
@@ -67,6 +73,7 @@ export class ReservationResolver {
   }
 
   @Mutation(() => Boolean)
+  @UseGuards(GqlAuthGuard)
   deleteRoom(@Args('id') id: string): Observable<boolean> {
     return this.reservationService.deleteReservation(id);
   }
