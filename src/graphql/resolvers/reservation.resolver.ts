@@ -7,14 +7,14 @@ import {
   Field,
   ID,
 } from '@nestjs/graphql';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+
 import { ReservationEntity } from '../../entities/reservation.entity';
 import { StatusEnum } from '../../entities/status.enum';
 import { RoomType } from './room.resolver';
 import { UserType } from './user.resolver';
-import { from, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { CreateReservationInput } from './dto/create-reservation.input';
+import { ReservationService } from '../services/reservation.service';
 
 @ObjectType()
 export class ReservationType {
@@ -36,29 +36,38 @@ export class ReservationType {
 
 @Resolver(() => ReservationType)
 export class ReservationResolver {
-  constructor(
-    @InjectRepository(ReservationEntity)
-    private readonly reservationRepository: Repository<ReservationEntity>,
-  ) {}
+  constructor(private readonly reservationService: ReservationService) {}
 
   @Query(() => [ReservationType])
   listReservations(
     @Args('skip') skip: number,
     @Args('limit') limit: number,
   ): Observable<ReservationEntity[]> {
-    return from(
-      this.reservationRepository.find({
-        relations: ['user', 'room'],
-        skip: skip,
-        take: limit,
-      }),
-    );
+    return this.reservationService.listReservations(skip, limit);
+  }
+
+  @Query(() => ReservationType, { nullable: true })
+  room(@Args('id') id: string): Observable<ReservationEntity> {
+    return this.reservationService.reservation(id);
   }
 
   @Mutation(() => ReservationType)
   createReservation(
     @Args('input') input: CreateReservationInput,
   ): Observable<ReservationEntity> {
-    return from(this.reservationRepository.save(input as ReservationEntity));
+    return this.reservationService.createReservation(input);
+  }
+
+  @Mutation(() => RoomType)
+  updateRoom(
+    @Args('id') id: string,
+    @Args('input') input: CreateReservationInput,
+  ): Observable<ReservationEntity> {
+    return this.reservationService.updateReservation(id, input);
+  }
+
+  @Mutation(() => Boolean)
+  deleteRoom(@Args('id') id: string): Observable<boolean> {
+    return this.reservationService.deleteReservation(id);
   }
 }
