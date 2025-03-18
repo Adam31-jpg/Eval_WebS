@@ -7,9 +7,11 @@ import { RoomEntity } from './entities/room.entity';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
+import { GraphQLAppModule } from './graphql/graphql.module';
 
 @Module({
   imports: [
+    GraphQLAppModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',

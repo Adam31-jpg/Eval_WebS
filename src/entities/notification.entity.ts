@@ -26,6 +26,6 @@ export class NotificationEntity {
   @CreateDateColumn({ type: 'timestamp' })
   notification_date: Date;
 
-  @Column({ type: 'bit', default: 0 })
+  @Column({ type: 'boolean', default: 0 })
   is_sent: boolean;
 }

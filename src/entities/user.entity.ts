@@ -10,7 +10,7 @@ import { ReservationEntity } from './reservation.entity';
 @Entity('users')
 export class UserEntity {
   @PrimaryGeneratedColumn()
-  id: string;
+  id?: string;
 
   @Column({ type: 'varchar', unique: true })
   keycloak_id: string;

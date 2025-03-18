@@ -1,0 +1,63 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type RoomType {
+  id: ID!
+  name: String!
+  capacity: String!
+  location: String!
+  created_at: String!
+  reservations: [ReservationType!]
+}
+
+type accessTokenType {
+  accessToken: String!
+}
+
+type UserType {
+  id: ID!
+  keycloak_id: String!
+  email: String!
+  created_at: String!
+  reservations: [ReservationType!]
+}
+
+type ReservationType {
+  id: ID!
+  start_time: String!
+  end_time: String!
+  status: String!
+  location: String!
+  created_at: String!
+  room: RoomType
+  user: UserType
+}
+
+type Query {
+  listReservations(skip: Float!, limit: Float!): [ReservationType!]!
+  room(id: String!): RoomType
+  listUsers(skip: Float!, limit: Float!): [UserType!]!
+  login(email: String!, password: String!): accessTokenType!
+  listRooms(skip: Float!, limit: Float!): [RoomType!]!
+}
+
+type Mutation {
+  createReservation(input: CreateReservationInput!): ReservationType!
+  updateRoom(id: String!, input: CreateRoomInput!): RoomType!
+  deleteRoom(id: String!): Boolean!
+  createRoom(input: CreateRoomInput!): RoomType!
+}
+
+input CreateReservationInput {
+  start_time: String!
+  end_time: String!
+  status: String!
+  location: String!
+}
+
+input CreateRoomInput {
+  name: String!
+  capacity: String!
+  location: String!
+}
