@@ -4,6 +4,7 @@ import { NotificationEntity } from './entities/notification.entity';
 import { ReservationEntity } from './entities/reservation.entity';
 import { RoomEntity } from './entities/room.entity';
 import { UserEntity } from './entities/user.entity';
+import { NotificationClient } from './grpc/notification/notification.client';
 import { NotificationController } from './rest/notification/notification.controller';
 import { NotificationService } from './rest/notification/notification.service';
 import { ReservationController } from './rest/reservation/reservation.controller';
@@ -43,6 +44,7 @@ import { UserService } from './rest/user/user.service';
     RoomService,
     ReservationService,
     NotificationService,
+    NotificationClient,
   ],
 })
 export class AppModule {}

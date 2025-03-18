@@ -1,5 +1,7 @@
 import { NestFactory } from '@nestjs/core';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { join } from 'path';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -21,6 +23,24 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, document); // Interface Swagger disponible sur /api-docs
+
+  // Configurer l'application comme un microservice gRPC
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.GRPC,
+    options: {
+      package: ['user', 'room', 'reservation', 'notification'],
+      protoPath: [
+        join(__dirname, '../src/grpc/user/user.proto'),
+        join(__dirname, '../src/grpc/room/room.proto'),
+        join(__dirname, '../src/grpc/reservation/reservation.proto'),
+        join(__dirname, '../src/grpc/notification/notification.proto'),
+      ],
+      url: '0.0.0.0:50051', // Port gRPC différent du port HTTP
+    },
+  });
+
+  // Démarrer les microservices et l'application HTTP
+  await app.startAllMicroservices();
 
   await app.listen(process.env.PORT ?? 3000);
 }

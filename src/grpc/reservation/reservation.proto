@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package reservation;
+
+service ReservationService {
+  rpc Create(Reservation) returns (Reservation) {}
+  rpc FindAll(Empty) returns (Reservations) {}
+  rpc FindOne(ReservationById) returns (Reservation) {}
+  rpc Update(UpdateReservationRequest) returns (Reservation) {}
+  rpc Remove(ReservationById) returns (Empty) {}
+}
+
+message Empty {}
+
+message ReservationById {
+  string id = 1;
+}
+
+message UpdateReservationRequest {
+  string id = 1;
+  Reservation reservation = 2;
+}
+
+message Reservation {
+  string id = 1;
+  int32 user_id = 2;
+  int32 room_id = 3;
+  string location = 4;
+  string created_at = 5;
+  string start_time = 6;
+  string end_time = 7;
+  string status = 8;
+}
+
+message Reservations {
+  repeated Reservation reservations = 1;
+}

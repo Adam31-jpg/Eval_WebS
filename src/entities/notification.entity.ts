@@ -40,9 +40,9 @@ export class NotificationEntity {
     description: 'Date de la notification',
     example: '2025-03-18T10:30:00Z',
   })
-  notifiacation_date: Date;
+  notification_date: Date;
 
-  @Column({ type: 'bit', default: 0 })
+  @Column({ type: 'boolean', default: false })
   @ApiProperty({
     description: 'Indique si la notification a été envoyée',
     example: false,

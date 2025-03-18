@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { GrpcMethod } from '@nestjs/microservices';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserEntity } from '../../entities/user.entity';
 import { UserService } from './user.service';
@@ -75,5 +76,33 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé.' })
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
+  }
+
+  // Méthodes gRPC
+  @GrpcMethod('UserService', 'Create')
+  grpcCreate(user: UserEntity) {
+    return this.userService.create(user);
+  }
+
+  @GrpcMethod('UserService', 'FindAll')
+  async grpcFindAll() {
+    const users = await this.userService.findAll();
+    return { users };
+  }
+
+  @GrpcMethod('UserService', 'FindOne')
+  grpcFindOne(data: { id: string }) {
+    return this.userService.findOne(+data.id);
+  }
+
+  @GrpcMethod('UserService', 'Update')
+  grpcUpdate(data: { id: string; user: UserEntity }) {
+    return this.userService.update(+data.id, data.user);
+  }
+
+  @GrpcMethod('UserService', 'Remove')
+  async grpcRemove(data: { id: string }) {
+    await this.userService.remove(+data.id);
+    return {};
   }
 }

@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { GrpcMethod } from '@nestjs/microservices';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RoomEntity } from 'src/entities/room.entity';
 import { RoomService } from './room.service';
@@ -72,5 +73,33 @@ export class RoomController {
   @ApiResponse({ status: 404, description: 'Chambre non trouvée.' })
   remove(@Param('id') id: string) {
     return this.roomService.remove(+id);
+  }
+
+  // Méthodes gRPC
+  @GrpcMethod('RoomService', 'Create')
+  grpcCreate(room: RoomEntity) {
+    return this.roomService.create(room);
+  }
+
+  @GrpcMethod('RoomService', 'FindAll')
+  async grpcFindAll() {
+    const rooms = await this.roomService.findAll();
+    return { rooms };
+  }
+
+  @GrpcMethod('RoomService', 'FindOne')
+  grpcFindOne(data: { id: string }) {
+    return this.roomService.findOne(+data.id);
+  }
+
+  @GrpcMethod('RoomService', 'Update')
+  grpcUpdate(data: { id: string; room: RoomEntity }) {
+    return this.roomService.update(+data.id, data.room);
+  }
+
+  @GrpcMethod('RoomService', 'Remove')
+  async grpcRemove(data: { id: string }) {
+    await this.roomService.remove(+data.id);
+    return {};
   }
 }
