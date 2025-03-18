@@ -2,9 +2,10 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToMany,
   BeforeInsert,
   BeforeUpdate,
+  CreateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { StatusEnum } from './status.enum';
@@ -20,7 +21,7 @@ export class ReservationEntity {
   })
   user_id: number;
 
-  @OneToMany(() => UserEntity, (user) => user.id, {
+  @ManyToOne(() => UserEntity, (user) => user.id, {
     cascade: true,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
@@ -32,14 +33,17 @@ export class ReservationEntity {
   })
   room_id: number;
 
-  @OneToMany(() => RoomEntity, (room) => room.id)
+  @ManyToOne(() => RoomEntity, (room) => room.id)
   room?: RoomEntity;
 
   @Column({ type: 'varchar' })
   location: string;
 
-  @Column({ type: 'timestamp' })
-  created_at: Date;
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+  })
+  created_at?: string;
 
   @BeforeInsert()
   @BeforeUpdate()
@@ -49,10 +53,10 @@ export class ReservationEntity {
     }
   }
   @Column({ type: 'timestamp' })
-  start_time: Date;
+  start_time: string;
 
   @Column({ type: 'timestamp' })
-  end_time: Date;
+  end_time: string;
 
   @Column({ type: 'varchar' })
   status: StatusEnum;

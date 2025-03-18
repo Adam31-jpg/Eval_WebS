@@ -4,6 +4,9 @@ import { NotificationEntity } from './entities/notification.entity';
 import { ReservationEntity } from './entities/reservation.entity';
 import { UserEntity } from './entities/user.entity';
 import { RoomEntity } from './entities/room.entity';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -23,6 +26,10 @@ import { RoomEntity } from './entities/room.entity';
       UserEntity,
       RoomEntity,
     ]),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      driver: ApolloDriver,
+    }),
   ],
   controllers: [],
   providers: [],

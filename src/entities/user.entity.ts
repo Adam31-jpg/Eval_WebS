@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  OneToMany,
+} from 'typeorm';
+import { ReservationEntity } from './reservation.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -11,6 +18,12 @@ export class UserEntity {
   @Column({ type: 'varchar', unique: true })
   email: string;
 
-  @Column({ type: 'timestamp' })
-  created_at: Date;
+  @OneToMany(() => ReservationEntity, (reservation) => reservation.user)
+  reservations?: ReservationEntity[];
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+  })
+  created_at?: string;
 }

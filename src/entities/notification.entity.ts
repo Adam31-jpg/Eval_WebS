@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  CreateDateColumn,
+} from 'typeorm';
 import { ReservationEntity } from './reservation.entity';
 
 @Entity('notifications')
@@ -17,8 +23,8 @@ export class NotificationEntity {
   @Column({ type: 'varchar' })
   message: string;
 
-  @Column({ type: 'timestamp' })
-  notifiacation_date: Date;
+  @CreateDateColumn({ type: 'timestamp' })
+  notification_date: Date;
 
   @Column({ type: 'bit', default: 0 })
   is_sent: boolean;
