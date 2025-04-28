@@ -18,7 +18,7 @@ export class RoomEntity {
   name: string;
 
   @Column({ type: 'int', default: 0, nullable: false })
-  capacity: string;
+  capacity: number;
 
   @Column({ type: 'varchar' })
   location: string;

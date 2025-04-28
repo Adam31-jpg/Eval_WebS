@@ -58,6 +58,6 @@ input CreateReservationInput {
 
 input CreateRoomInput {
   name: String!
-  capacity: String!
+  capacity: Float!
   location: String!
 }
