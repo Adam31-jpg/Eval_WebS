@@ -11,7 +11,7 @@ export class UserEntity {
     description: "ID unique de l'utilisateur",
     example: '1',
   })
-  id: string;
+  id?: string;
 
 
   @Column({ type: 'varchar', unique: true })

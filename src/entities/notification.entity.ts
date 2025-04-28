@@ -5,13 +5,6 @@
 
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-  CreateDateColumn,
-} from 'typeorm';
 import { ReservationEntity } from './reservation.entity';
 
 @Entity('notifications')

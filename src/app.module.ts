@@ -33,6 +33,7 @@ const configService = new ConfigService();
       synchronize: true,
     }),
   ],
+
   controllers: [
     UserController,
     RoomController,

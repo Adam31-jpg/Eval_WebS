@@ -11,7 +11,7 @@ export class AuthService {
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     private readonly httpService: HttpService,
-  ) {}
+  ) { }
 
   login(email: string, password: string) {
     return this.getKeycloakToken(email, password).pipe(
@@ -27,7 +27,8 @@ export class AuthService {
             if (!user) {
               return this.createUser({
                 email: userInfo.email,
-                keycloak_id: userInfo.sub,
+                keycloakId: userInfo.sub,
+                createdAt: new Date()
               });
             }
             return of(user);
