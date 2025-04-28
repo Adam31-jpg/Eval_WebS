@@ -46,5 +46,6 @@ import { UserService } from './rest/user/user.service';
     NotificationService,
     NotificationClient,
   ],
+
 })
-export class AppModule {}
+export class AppModule { }

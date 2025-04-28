@@ -15,7 +15,7 @@ import { NotificationService } from './notification.service';
 @ApiTags('notifications')
 @Controller('notifications')
 export class NotificationController {
-  constructor(private readonly notificationService: NotificationService) {}
+  constructor(private readonly notificationService: NotificationService) { }
 
   @Get()
   @ApiOperation({ summary: 'Récupérer toutes les notifications' })
@@ -94,16 +94,16 @@ export class NotificationController {
       const request = data;
       // Vérifiez que toutes les propriétés nécessaires sont présentes
       if (!request.reservationId || !request.message) {
-        throw new Error('reservation_id et message sont requis');
+        throw new Error('reservationId et message sont requis');
       }
 
       const notification = new NotificationEntity();
-      notification.reservation_id = request.reservationId;
+      notification.reservationId = request.reservationId;
       notification.message = request.message;
-      notification.notification_date = request.notificationDate
+      notification.notificationDate = request.notificationDate
         ? new Date(request.notificationDate)
         : new Date();
-      notification.is_sent =
+      notification.isSent =
         request.isSent !== undefined ? request.isSent : false;
 
       return this.notificationService.create(notification);
@@ -119,7 +119,7 @@ export class NotificationController {
     // Formater les dates pour gRPC
     const formattedNotifications = notifications.map((notif) => ({
       ...notif,
-      notification_date: notif.notification_date?.toISOString(),
+      notificationDate: notif.notificationDate?.toISOString(),
     }));
 
     return { notifications: formattedNotifications };
@@ -136,7 +136,7 @@ export class NotificationController {
     // Formater les dates pour gRPC
     return {
       ...notification,
-      notification_date: notification.notification_date?.toISOString(),
+      notificationDate: notification.notificationDate?.toISOString(),
     };
   }
 
@@ -144,11 +144,11 @@ export class NotificationController {
   async grpcUpdate(data: { id: string; notification: NotificationEntity }) {
     // Convertir les chaînes en dates
     if (
-      data.notification.notification_date &&
-      typeof data.notification.notification_date === 'string'
+      data.notification.notificationDate &&
+      typeof data.notification.notificationDate === 'string'
     ) {
-      data.notification.notification_date = new Date(
-        data.notification.notification_date,
+      data.notification.notificationDate = new Date(
+        data.notification.notificationDate,
       );
     }
 
@@ -164,7 +164,7 @@ export class NotificationController {
     // Formater les dates pour gRPC
     return {
       ...updatedNotification,
-      notification_date: updatedNotification.notification_date?.toISOString(),
+      notificationDate: updatedNotification.notificationDate?.toISOString(),
     };
   }
 

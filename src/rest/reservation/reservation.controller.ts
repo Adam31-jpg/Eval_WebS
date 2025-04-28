@@ -15,7 +15,7 @@ import { ReservationService } from './reservation.service';
 @ApiTags('reservations')
 @Controller('reservations')
 export class ReservationController {
-  constructor(private readonly reservationService: ReservationService) {}
+  constructor(private readonly reservationService: ReservationService) { }
 
   @Post()
   @ApiOperation({ summary: 'Créer une nouvelle réservation' })
@@ -85,14 +85,14 @@ export class ReservationController {
   @GrpcMethod('ReservationService', 'Create')
   grpcCreate(reservation: ReservationEntity) {
     // Pour gRPC, nous devons convertir les dates de chaîne en objets Date
-    if (typeof reservation.start_time === 'string') {
-      reservation.start_time = new Date(reservation.start_time);
+    if (typeof reservation.startTime === 'string') {
+      reservation.startTime = new Date(reservation.startTime);
     }
-    if (typeof reservation.end_time === 'string') {
-      reservation.end_time = new Date(reservation.end_time);
+    if (typeof reservation.endTime === 'string') {
+      reservation.endTime = new Date(reservation.endTime);
     }
-    if (typeof reservation.created_at === 'string') {
-      reservation.created_at = new Date(reservation.created_at);
+    if (typeof reservation.createdAt === 'string') {
+      reservation.createdAt = new Date(reservation.createdAt);
     }
 
     return this.reservationService.create(reservation);
@@ -105,9 +105,9 @@ export class ReservationController {
     // Formater les dates pour gRPC (convertir Date en chaînes)
     const formattedReservations = reservations.map((res) => ({
       ...res,
-      created_at: res.created_at?.toISOString(),
-      start_time: res.start_time?.toISOString(),
-      end_time: res.end_time?.toISOString(),
+      createdAt: res.createdAt?.toISOString(),
+      startTime: res.startTime?.toISOString(),
+      endTime: res.endTime?.toISOString(),
     }));
 
     return { reservations: formattedReservations };
@@ -120,9 +120,9 @@ export class ReservationController {
     // Formater les dates pour gRPC
     return {
       ...reservation,
-      created_at: reservation.created_at?.toISOString(),
-      start_time: reservation.start_time?.toISOString(),
-      end_time: reservation.end_time?.toISOString(),
+      createdAt: reservation.createdAt?.toISOString(),
+      startTime: reservation.startTime?.toISOString(),
+      endTime: reservation.endTime?.toISOString(),
     };
   }
 
@@ -130,16 +130,16 @@ export class ReservationController {
   async grpcUpdate(data: { id: string; reservation: ReservationEntity }) {
     // Convertir les chaînes en dates
     if (
-      data.reservation.start_time &&
-      typeof data.reservation.start_time === 'string'
+      data.reservation.startTime &&
+      typeof data.reservation.startTime === 'string'
     ) {
-      data.reservation.start_time = new Date(data.reservation.start_time);
+      data.reservation.startTime = new Date(data.reservation.startTime);
     }
     if (
-      data.reservation.end_time &&
-      typeof data.reservation.end_time === 'string'
+      data.reservation.endTime &&
+      typeof data.reservation.endTime === 'string'
     ) {
-      data.reservation.end_time = new Date(data.reservation.end_time);
+      data.reservation.endTime = new Date(data.reservation.endTime);
     }
 
     const updatedReservation = await this.reservationService.update(
@@ -150,9 +150,9 @@ export class ReservationController {
     // Formater les dates pour gRPC
     return {
       ...updatedReservation,
-      created_at: updatedReservation.created_at?.toISOString(),
-      start_time: updatedReservation.start_time?.toISOString(),
-      end_time: updatedReservation.end_time?.toISOString(),
+      createdAt: updatedReservation.createdAt?.toISOString(),
+      startTime: updatedReservation.startTime?.toISOString(),
+      endTime: updatedReservation.endTime?.toISOString(),
     };
   }
 

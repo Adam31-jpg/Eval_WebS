@@ -27,7 +27,7 @@ export class ReservationEntity {
     description: "ID de l'utilisateur qui a fait la réservation",
     example: 1,
   })
-  user_id: number;
+  userId: number;
 
   @OneToMany(() => UserEntity, (user) => user.id, {
     cascade: true,
@@ -47,7 +47,7 @@ export class ReservationEntity {
     description: 'ID de la chambre réservée',
     example: 1,
   })
-  room_id: number;
+  roomId: number;
 
   @OneToMany(() => RoomEntity, (room) => room.id)
   @ApiProperty({
@@ -69,12 +69,12 @@ export class ReservationEntity {
     description: 'Date de création de la réservation',
     example: '2025-03-18T10:30:00Z',
   })
-  created_at: Date;
+  createdAt: Date;
 
   @BeforeInsert()
   @BeforeUpdate()
   validatesTimes() {
-    if (this.start_time >= this.end_time) {
+    if (this.startTime >= this.endTime) {
       throw new Error('La date de début doit être antérieure à la date de fin');
     }
   }
@@ -84,14 +84,14 @@ export class ReservationEntity {
     description: 'Date et heure de début de la réservation',
     example: '2025-04-01T14:00:00Z',
   })
-  start_time: Date;
+  startTime: Date;
 
   @Column({ type: 'timestamp' })
   @ApiProperty({
     description: 'Date et heure de fin de la réservation',
     example: '2025-04-01T16:00:00Z',
   })
-  end_time: Date;
+  endTime: Date;
 
   @Column({ type: 'varchar' })
   @ApiProperty({

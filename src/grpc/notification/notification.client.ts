@@ -12,7 +12,7 @@ interface NotificationService {
 interface CreateNotificationRequest {
   reservationId: number;
   message: string;
-  notifiacationDate: string;
+  notificationDate: string;
   isSent: boolean;
 }
 

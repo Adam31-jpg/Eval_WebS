@@ -11,7 +11,7 @@ export class ReservationService {
     @InjectRepository(ReservationEntity)
     private reservationRepository: Repository<ReservationEntity>,
     private notificationClient: NotificationClient,
-  ) {}
+  ) { }
 
   async create(reservation: ReservationEntity): Promise<ReservationEntity> {
     // Sauvegarder la réservation
@@ -20,7 +20,7 @@ export class ReservationService {
     // Créer une notification via gRPC
     const notificationRequest = {
       reservationId: parseInt(savedReservation.id),
-      message: `Nouvelle réservation créée pour la chambre ${savedReservation.room_id}`,
+      message: `Nouvelle réservation créée pour la chambre ${savedReservation.roomId}`,
       notificationDate: new Date().toISOString(),
       isSent: false,
     };

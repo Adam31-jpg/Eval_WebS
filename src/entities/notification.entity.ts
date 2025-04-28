@@ -18,7 +18,7 @@ export class NotificationEntity {
     description: 'ID de la réservation associée',
     example: 1,
   })
-  reservation_id: number;
+  reservationId: number;
 
   @OneToMany(() => ReservationEntity, (reservation) => reservation.id)
   @ApiProperty({
@@ -40,12 +40,12 @@ export class NotificationEntity {
     description: 'Date de la notification',
     example: '2025-03-18T10:30:00Z',
   })
-  notification_date: Date;
+  notificationDate: Date;
 
   @Column({ type: 'boolean', default: false })
   @ApiProperty({
     description: 'Indique si la notification a été envoyée',
     example: false,
   })
-  is_sent: boolean;
+  isSent: boolean;
 }

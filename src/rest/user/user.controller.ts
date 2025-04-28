@@ -15,7 +15,7 @@ import { UserService } from './user.service';
 @ApiTags('users')
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Post()
   @ApiOperation({ summary: 'Créer un nouvel utilisateur' })
@@ -80,8 +80,26 @@ export class UserController {
 
   // Méthodes gRPC
   @GrpcMethod('UserService', 'Create')
-  grpcCreate(user: UserEntity) {
-    return this.userService.create(user);
+  async grpcCreate(user: any) {
+    console.log('gRPC Create - données reçues:', JSON.stringify(user));
+
+    // Gérer les deux formats possibles (camelCase et snake_case)
+    const keycloakId = user.keycloak_id || user.keycloakId;
+
+    // Vérifier si l'ID est présent
+    if (!keycloakId) {
+      throw new Error('keycloak_id est obligatoire');
+    }
+
+    // Créer un nouvel objet avec les propriétés correctes
+    const newUser: any = {
+      keycloakId: keycloakId,
+      email: user.email,
+      createdAt: user.created_at || user.createdAt ? new Date(user.created_at || user.createdAt) : new Date(),
+    };
+
+    console.log('gRPC Create - données à sauvegarder:', JSON.stringify(newUser));
+    return this.userService.create(newUser);
   }
 
   @GrpcMethod('UserService', 'FindAll')

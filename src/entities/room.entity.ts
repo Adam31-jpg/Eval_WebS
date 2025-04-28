@@ -38,5 +38,5 @@ export class RoomEntity {
     description: 'Date de création',
     example: '2025-03-18T10:30:00Z',
   })
-  created_at: Date;
+  createdAt: Date;
 }
