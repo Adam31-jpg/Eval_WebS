@@ -12,7 +12,9 @@ import { ReservationEntity } from '../entities/reservation.entity';
 import { RoomEntity } from '../entities/room.entity';
 import { UserEntity } from '../entities/user.entity';
 import { AuthModule } from '../auth/auth.module';
-
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path';
 @Module({
   imports: [
     forwardRef(() => AuthModule),
@@ -23,6 +25,10 @@ import { AuthModule } from '../auth/auth.module';
       UserEntity,
       RoomEntity,
     ]),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      driver: ApolloDriver,
+    }),
   ],
   controllers: [],
   providers: [

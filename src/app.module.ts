@@ -4,13 +4,10 @@ import { NotificationEntity } from './entities/notification.entity';
 import { ReservationEntity } from './entities/reservation.entity';
 import { UserEntity } from './entities/user.entity';
 import { RoomEntity } from './entities/room.entity';
-import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { join } from 'path';
 import { GraphQLAppModule } from './graphql/graphql.module';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
-
+import { ConfigModule, ConfigService } from '@nestjs/config';
+const configService = new ConfigService();
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -18,23 +15,13 @@ import { ConfigModule } from '@nestjs/config';
     GraphQLAppModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'pguser',
-      password: 'pgpass',
-      database: 'pgdb',
+      host: configService.get<string>('DB_HOST'),
+      port: configService.get<number>('DB_PORT'),
+      username: configService.get<string>('DB_USER'),
+      password: configService.get<string>('DB_PASSWORD'),
+      database: configService.get<string>('DB_NAME'),
       entities: [NotificationEntity, ReservationEntity, UserEntity, RoomEntity],
       synchronize: true,
-    }),
-    TypeOrmModule.forFeature([
-      NotificationEntity,
-      ReservationEntity,
-      UserEntity,
-      RoomEntity,
-    ]),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      driver: ApolloDriver,
     }),
   ],
   controllers: [],

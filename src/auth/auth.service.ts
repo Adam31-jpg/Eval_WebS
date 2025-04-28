@@ -1,17 +1,18 @@
 import { HttpService } from '@nestjs/axios';
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { switchMap, forkJoin, of, map } from 'rxjs';
+import { switchMap, forkJoin, of, map, Observable, from, defer } from 'rxjs';
 import { UserEntity } from '../entities/user.entity';
-import { UserService } from '../graphql/services/user.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
     private readonly jwtService: JwtService,
     private readonly httpService: HttpService,
-    @Inject(forwardRef(() => UserService))
-    private readonly userService: UserService,
   ) {}
 
   login(email: string, password: string) {
@@ -21,13 +22,13 @@ export class AuthService {
       ),
       switchMap((response) =>
         forkJoin([
-          this.userService.getByEmail(response.data.email),
+          this.getByEmail(response.data.email as string),
           of(response.data),
         ]),
       ),
       switchMap(([user, userInfo]: [UserEntity, any]) => {
         if (!user) {
-          return this.userService.createUser({
+          return this.createUser({
             email: userInfo.email,
             keycloak_id: userInfo.sub,
           });
@@ -42,6 +43,18 @@ export class AuthService {
           sub: user.id,
         }),
       })),
+    );
+  }
+
+  private createUser(user: UserEntity) {
+    return defer(() => this.userRepository.save(user));
+  }
+
+  private getByEmail(email: string): Observable<UserEntity> {
+    return from(
+      this.userRepository.findOneOrFail({
+        where: { email },
+      }),
     );
   }
 

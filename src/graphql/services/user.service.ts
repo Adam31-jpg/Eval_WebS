@@ -1,11 +1,6 @@
 import { UserEntity } from '../../entities/user.entity';
 import { defer, from, Observable, tap } from 'rxjs';
-import {
-  forwardRef,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuthService } from '../../auth/auth.service';
@@ -15,7 +10,6 @@ export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-    @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
   ) {}
 
@@ -39,13 +33,7 @@ export class UserService {
     );
   }
 
-  getByEmail(email: string) {
-    return this.userRepository.findOne({
-      where: { email },
-    });
-  }
-
-  createUser(user: UserEntity) {
+  createUser(user: UserEntity): Observable<UserEntity> {
     return defer(() => this.userRepository.save(user));
   }
 
