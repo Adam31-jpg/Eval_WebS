@@ -6,6 +6,8 @@ import {
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
+  CreateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 import { RoomEntity } from './room.entity';
 import { StatusEnum } from './status.enum';
@@ -29,7 +31,7 @@ export class ReservationEntity {
   })
   userId: number;
 
-  @OneToMany(() => UserEntity, (user) => user.id, {
+  @ManyToOne(() => UserEntity, (user) => user.id, {
     cascade: true,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
@@ -48,6 +50,7 @@ export class ReservationEntity {
     example: 1,
   })
   roomId: number;
+
 
   @OneToMany(() => RoomEntity, (room) => room.id)
   @ApiProperty({

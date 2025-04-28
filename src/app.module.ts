@@ -13,25 +13,25 @@ import { RoomController } from './rest/room/room.controller';
 import { RoomService } from './rest/room/room.service';
 import { UserController } from './rest/user/user.controller';
 import { UserService } from './rest/user/user.service';
-
+import { GraphQLAppModule } from './graphql/graphql.module';
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+const configService = new ConfigService();
 @Module({
   imports: [
+    ConfigModule.forRoot(),
+    AuthModule,
+    GraphQLAppModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'pguser',
-      password: 'pgpass',
-      database: 'pgdb',
+      host: configService.get<string>('DB_HOST'),
+      port: configService.get<number>('DB_PORT'),
+      username: configService.get<string>('DB_USER'),
+      password: configService.get<string>('DB_PASSWORD'),
+      database: configService.get<string>('DB_NAME'),
       entities: [NotificationEntity, ReservationEntity, UserEntity, RoomEntity],
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([
-      NotificationEntity,
-      ReservationEntity,
-      UserEntity,
-      RoomEntity,
-    ]),
   ],
   controllers: [
     UserController,

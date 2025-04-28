@@ -1,3 +1,6 @@
+
+
+
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -9,6 +12,7 @@ export class UserEntity {
     example: '1',
   })
   id: string;
+
 
   @Column({ type: 'varchar', unique: true })
   @ApiProperty({

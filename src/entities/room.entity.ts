@@ -1,3 +1,7 @@
+
+
+
+
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -24,7 +28,8 @@ export class RoomEntity {
     description: 'Capacité de la chambre (nombre de personnes)',
     example: '4',
   })
-  capacity: string;
+  capacity: number;
+
 
   @Column({ type: 'varchar' })
   @ApiProperty({
