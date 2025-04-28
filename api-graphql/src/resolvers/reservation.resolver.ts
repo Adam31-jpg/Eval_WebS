@@ -8,15 +8,15 @@ import {
   ID,
 } from '@nestjs/graphql';
 
-import { ReservationEntity } from '../../entities/reservation.entity';
-import { StatusEnum } from '../../entities/status.enum';
+import { ReservationEntity } from '../entities/reservation.entity';
+import { StatusEnum } from '../entities/status.enum';
 import { RoomType } from './room.resolver';
 import { UserType } from './user.resolver';
 import { Observable } from 'rxjs';
 import { CreateReservationInput } from './dto/create-reservation.input';
 import { ReservationService } from '../services/reservation.service';
 import { UseGuards } from '@nestjs/common';
-import { GqlAuthGuard } from '../../auth/gq-auth.guard';
+import { GqlAuthGuard } from '../auth/gq-auth.guard';
 
 @ObjectType()
 export class ReservationType {

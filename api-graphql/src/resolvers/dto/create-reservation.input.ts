@@ -1,5 +1,5 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { StatusEnum } from '../../../entities/status.enum';
+import { StatusEnum } from '../../entities/status.enum';
 
 @InputType()
 export class CreateReservationInput {

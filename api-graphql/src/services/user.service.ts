@@ -1,9 +1,9 @@
-import { UserEntity } from '../../entities/user.entity';
+import { UserEntity } from '../entities/user.entity';
 import { defer, from, Observable, tap } from 'rxjs';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AuthService } from '../../auth/auth.service';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UserService {

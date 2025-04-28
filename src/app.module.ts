@@ -4,17 +4,15 @@ import { NotificationEntity } from './entities/notification.entity';
 import { ReservationEntity } from './entities/reservation.entity';
 import { RoomEntity } from './entities/room.entity';
 import { UserEntity } from './entities/user.entity';
-import { GraphQLAppModule } from './graphql/graphql.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { RestModule } from './rest/rest.module';
 const configService = new ConfigService();
+import { RestModule } from './rest/rest.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
     AuthModule,
     RestModule,
-    GraphQLAppModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: configService.get<string>('DB_HOST'),

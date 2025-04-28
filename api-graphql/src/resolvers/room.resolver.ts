@@ -1,13 +1,20 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ObjectType,
+  Field,
+  ID,
+} from '@nestjs/graphql';
 
-import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { RoomEntity } from '../../entities/room.entity';
+import { RoomEntity } from '../entities/room.entity';
 import { ReservationType } from './reservation.resolver';
 import { Observable } from 'rxjs';
 import { CreateRoomInput } from './dto/create-room.input';
 import { RoomService } from '../services/room.service';
 import { UseGuards } from '@nestjs/common';
-import { GqlAuthGuard } from '../../auth/gq-auth.guard';
+import { GqlAuthGuard } from '../auth/gq-auth.guard';
 
 @ObjectType()
 export class RoomType {

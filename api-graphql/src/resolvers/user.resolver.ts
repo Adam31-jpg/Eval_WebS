@@ -1,11 +1,10 @@
-import { Resolver, Query, Args } from '@nestjs/graphql';
-import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { UserEntity } from '../../entities/user.entity';
+import { Resolver, Query, Args, ObjectType, Field, ID } from '@nestjs/graphql';
+import { UserEntity } from '../entities/user.entity';
 import { ReservationType } from './reservation.resolver';
 import { UserService } from '../services/user.service';
 import { Observable } from 'rxjs';
 import { UseGuards } from '@nestjs/common';
-import { GqlAuthGuard } from '../../auth/gq-auth.guard';
+import { GqlAuthGuard } from '../auth/gq-auth.guard';
 
 @ObjectType()
 export class accessTokenType {

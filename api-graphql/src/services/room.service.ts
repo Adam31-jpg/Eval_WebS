@@ -1,7 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { RoomEntity } from '../../entities/room.entity';
+import { RoomEntity } from '../entities/room.entity';
 import { from, map, Observable, switchMap, tap } from 'rxjs';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRoomInput } from '../resolvers/dto/create-room.input';

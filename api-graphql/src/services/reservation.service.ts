@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ReservationEntity } from '../../entities/reservation.entity';
+import { ReservationEntity } from '../entities/reservation.entity';
 import { from, map, Observable, switchMap, tap } from 'rxjs';
 import { CreateReservationInput } from '../resolvers/dto/create-reservation.input';
 import { InjectRepository } from '@nestjs/typeorm';
