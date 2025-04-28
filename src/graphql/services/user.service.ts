@@ -23,7 +23,7 @@ export class UserService {
     return from(
       this.userRepository.find({
         relations: ['reservations', 'reservations.room'],
-        skip: skip,
+        skip,
         take: limit,
       }),
     );

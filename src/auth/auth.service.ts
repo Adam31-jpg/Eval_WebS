@@ -1,11 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { HttpService } from '@nestjs/axios';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { switchMap, forkJoin, of, iif, map } from 'rxjs';
+import { switchMap, forkJoin, of, map } from 'rxjs';
 import { UserEntity } from '../entities/user.entity';
 import { UserService } from '../graphql/services/user.service';
 
@@ -21,29 +17,31 @@ export class AuthService {
   login(email: string, password: string) {
     return this.getKeycloakToken(email, password).pipe(
       switchMap((response) =>
-        this.getKeycloakUserInfo(response.data.access_token).pipe(
-          switchMap((response) =>
-            forkJoin([
-              this.userService.getByEmail(response.data.email),
-              of(response.data),
-            ]),
-          ),
-          switchMap(([user, userInfo]: [UserEntity, any]) =>
-            iif(
-              () => !user,
-              this.userService.createUser({
-                email: userInfo.email,
-                keycloak_id: userInfo.sub,
-              }),
-              of(user),
-            ),
-          ),
-          switchMap((user: UserEntity) =>
-            this.jwtService.sign({ username: user.email, sub: user.id }),
-          ),
-          map((accessToken) => ({ accessToken: accessToken })),
-        ),
+        this.getKeycloakUserInfo(response.data.access_token),
       ),
+      switchMap((response) =>
+        forkJoin([
+          this.userService.getByEmail(response.data.email),
+          of(response.data),
+        ]),
+      ),
+      switchMap(([user, userInfo]: [UserEntity, any]) => {
+        if (!user) {
+          return this.userService.createUser({
+            email: userInfo.email,
+            keycloak_id: userInfo.sub,
+          });
+        }
+
+        return of(user);
+      }),
+
+      map((user: UserEntity) => ({
+        accessToken: this.jwtService.sign({
+          username: user.email,
+          sub: user.id,
+        }),
+      })),
     );
   }
 
