@@ -1,9 +1,10 @@
-
-
-
-
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('rooms')
 export class RoomEntity {
@@ -30,7 +31,6 @@ export class RoomEntity {
   })
   capacity: number;
 
-
   @Column({ type: 'varchar' })
   @ApiProperty({
     description: 'Localisation de la chambre',
@@ -38,7 +38,10 @@ export class RoomEntity {
   })
   location: string;
 
-  @Column({ type: 'timestamp' })
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+  })
   @ApiProperty({
     description: 'Date de création',
     example: '2025-03-18T10:30:00Z',

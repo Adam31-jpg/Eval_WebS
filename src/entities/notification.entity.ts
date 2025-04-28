@@ -1,10 +1,11 @@
-
-
-
-
-
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { ReservationEntity } from './reservation.entity';
 
 @Entity('notifications')
@@ -40,7 +41,10 @@ export class NotificationEntity {
   })
   message: string;
 
-  @Column({ type: 'timestamp' })
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+  })
   @ApiProperty({
     description: 'Date de la notification',
     example: '2025-03-18T10:30:00Z',
@@ -53,5 +57,4 @@ export class NotificationEntity {
     example: false,
   })
   isSent: boolean;
-
 }

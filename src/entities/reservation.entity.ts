@@ -51,7 +51,6 @@ export class ReservationEntity {
   })
   roomId: number;
 
-
   @OneToMany(() => RoomEntity, (room) => room.id)
   @ApiProperty({
     description: 'Données de la chambre',
@@ -67,7 +66,10 @@ export class ReservationEntity {
   })
   location: string;
 
-  @Column({ type: 'timestamp' })
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+  })
   @ApiProperty({
     description: 'Date de création de la réservation',
     example: '2025-03-18T10:30:00Z',
