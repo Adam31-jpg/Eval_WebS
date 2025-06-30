@@ -1,8 +1,5 @@
-
-
-
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('users')
 export class UserEntity {
@@ -13,8 +10,7 @@ export class UserEntity {
   })
   id: string;
 
-
-  @Column({ type: 'varchar', unique: true })
+  @Column({ type: 'varchar', unique: true, name: 'keycloak_id' })
   @ApiProperty({
     description: "ID keycloak de l'utilisateur",
     example: '550e8400-e29b-41d4-a716-446655440000',
@@ -28,7 +24,7 @@ export class UserEntity {
   })
   email: string;
 
-  @Column({ type: 'timestamp' })
+  @CreateDateColumn()
   @ApiProperty({
     description: 'Date de création du compte',
     example: '2025-03-18T10:30:00Z',

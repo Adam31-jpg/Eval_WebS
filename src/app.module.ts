@@ -32,6 +32,7 @@ const configService = new ConfigService();
       entities: [NotificationEntity, ReservationEntity, UserEntity, RoomEntity],
       synchronize: true,
     }),
+    TypeOrmModule.forFeature([NotificationEntity, ReservationEntity, UserEntity, RoomEntity]),
   ],
   controllers: [
     UserController,

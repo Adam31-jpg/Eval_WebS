@@ -4,10 +4,10 @@ import {
   BeforeUpdate,
   Column,
   Entity,
-  OneToMany,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { RoomEntity } from './room.entity';
 import { StatusEnum } from './status.enum';
@@ -36,6 +36,7 @@ export class ReservationEntity {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
+  @JoinColumn({ name: 'userId' })
   @ApiProperty({
     description: "Données de l'utilisateur",
     type: () => UserEntity,
@@ -51,8 +52,9 @@ export class ReservationEntity {
   })
   roomId: number;
 
-
-  @OneToMany(() => RoomEntity, (room) => room.id)
+  // CORRECTION: ManyToOne au lieu de OneToMany
+  @ManyToOne(() => RoomEntity, (room) => room.id)
+  @JoinColumn({ name: 'roomId' })
   @ApiProperty({
     description: 'Données de la chambre',
     type: () => RoomEntity,
@@ -67,7 +69,8 @@ export class ReservationEntity {
   })
   location: string;
 
-  @Column({ type: 'timestamp' })
+  // CORRECTION: Utilisez CreateDateColumn
+  @CreateDateColumn()
   @ApiProperty({
     description: 'Date de création de la réservation',
     example: '2025-03-18T10:30:00Z',

@@ -1,0 +1,38 @@
+syntax = "proto3";
+package notification;
+
+service NotificationService {
+    rpc CreateNotification (CreateNotificationInput) returns (CreateOrUpdateNotificationOutput);
+    rpc UpdateNotification (UpdateNotificationInput) returns (CreateOrUpdateNotificationOutput);
+    rpc GetNotification (GetNotificationInput) returns (CreateOrUpdateNotificationOutput);
+}
+
+service ExportService {
+    rpc ExportReservations (ExportReservationsInput) returns (ExportReservationsOutput);
+}
+
+message CreateNotificationInput {
+    string reservationId = 1;
+    string message = 2;
+    string notificationDate = 3;
+}
+message UpdateNotificationInput {
+    string id = 1;
+    string message = 3;
+    string notificationDate = 4;
+}
+message CreateOrUpdateNotificationOutput {
+    string id = 1;
+    string reservationId = 2;
+    string message = 3;
+    string notificationDate = 4;
+}
+message GetNotificationInput {
+    string id = 1;
+}
+message ExportReservationsInput {
+    string userId = 1;
+}
+message ExportReservationsOutput {
+    string url = 1;
+}

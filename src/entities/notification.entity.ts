@@ -1,17 +1,5 @@
-
-
-
-
-
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-  CreateDateColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { ReservationEntity } from './reservation.entity';
 
 @Entity('notifications')
@@ -32,7 +20,9 @@ export class NotificationEntity {
   })
   reservationId: number;
 
-  @OneToMany(() => ReservationEntity, (reservation) => reservation.id)
+  // CORRECTION: ManyToOne au lieu de OneToMany
+  @ManyToOne(() => ReservationEntity, (reservation) => reservation.id)
+  @JoinColumn({ name: 'reservationId' })
   @ApiProperty({
     description: 'Données de la réservation',
     type: () => ReservationEntity,
@@ -60,5 +50,4 @@ export class NotificationEntity {
     example: false,
   })
   isSent: boolean;
-
 }
