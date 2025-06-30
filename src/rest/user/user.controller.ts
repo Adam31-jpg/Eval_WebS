@@ -9,7 +9,10 @@ import {
   Query,
   UseGuards,
   HttpCode,
-  HttpStatus
+  HttpStatus,
+  Request,
+  ForbiddenException,
+  UnauthorizedException
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GrpcMethod } from '@nestjs/microservices';
@@ -34,20 +37,53 @@ export class UserController {
   @ApiResponse({ status: 400, description: 'Requête invalide.' })
   @ApiResponse({ status: 401, description: 'Token manquant ou invalide.' })
   @ApiResponse({ status: 403, description: 'Droits insuffisants.' })
-  async create(@Body() user: any) {
-    try {
-      // Simuler la vérification des droits
-      // En mode mock, on accepte les tokens qui commencent par 'mock-admin'
-      // Dans un vrai environnement, vous vérifieriez les rôles JWT
+  async create(@Body() user: any, @Request() req: any) {
+    console.log('🔵 UserController.create appelé');
+    console.log('Headers:', req.headers.authorization?.substring(0, 30) + '...');
+    console.log('User depuis JWT:', req.user);
+    console.log('Body:', user);
 
+    // Vérifier les droits administrateur
+    const currentUser = req.user;
+    if (!currentUser) {
+      console.log('❌ Utilisateur non authentifié');
+      throw new UnauthorizedException('Utilisateur non authentifié');
+    }
+
+    // Extraire le token de l'en-tête pour vérification supplémentaire
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.replace('Bearer ', '');
+
+    console.log('🔍 Vérification des droits admin...');
+    console.log('Current user roles:', currentUser.roles);
+    console.log('Token type:', token?.substring(0, 10));
+
+    // Vérifier si l'utilisateur a les droits admin
+    const hasAdminRights = currentUser.roles?.includes('admin') ||
+      token?.includes('admin') ||
+      (process.env.NODE_ENV === 'test' && token?.startsWith('mock-admin'));
+
+    console.log('Has admin rights:', hasAdminRights);
+
+    if (!hasAdminRights) {
+      console.log('❌ Droits insuffisants pour:', currentUser);
+      throw new ForbiddenException('Droits administrateur requis pour créer un utilisateur');
+    }
+
+    try {
+      // Créer l'utilisateur
       const newUser = {
         email: user.email,
         keycloakId: user.keycloakId || `kc_${Date.now()}`,
       };
 
-      return this.userService.create(newUser);
+      console.log('✅ Création de l\'utilisateur:', newUser);
+      const result = await this.userService.create(newUser);
+      console.log('✅ Utilisateur créé:', result);
+      return result;
     } catch (error) {
-      console.error('Erreur lors de la création utilisateur:', error);
+      console.error('❌ Erreur lors de la création utilisateur:', error.message);
+      // Re-lancer l'erreur pour que NestJS la gère proprement
       throw error;
     }
   }

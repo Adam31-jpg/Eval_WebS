@@ -24,6 +24,7 @@ export class ReservationEntity {
 
   @Column({
     type: 'int',
+    name: 'user_id', // Spécifier le nom de colonne explicitement
   })
   @ApiProperty({
     description: "ID de l'utilisateur qui a fait la réservation",
@@ -36,7 +37,7 @@ export class ReservationEntity {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn({ name: 'userId' })
+  @JoinColumn({ name: 'user_id' }) // Utiliser le nom de colonne DB
   @ApiProperty({
     description: "Données de l'utilisateur",
     type: () => UserEntity,
@@ -45,6 +46,7 @@ export class ReservationEntity {
 
   @Column({
     type: 'int',
+    name: 'room_id', // Spécifier le nom de colonne explicitement
   })
   @ApiProperty({
     description: 'ID de la chambre réservée',
@@ -52,9 +54,8 @@ export class ReservationEntity {
   })
   roomId: number;
 
-  // CORRECTION: ManyToOne au lieu de OneToMany
   @ManyToOne(() => RoomEntity, (room) => room.id)
-  @JoinColumn({ name: 'roomId' })
+  @JoinColumn({ name: 'room_id' }) // Utiliser le nom de colonne DB
   @ApiProperty({
     description: 'Données de la chambre',
     type: () => RoomEntity,
@@ -69,8 +70,7 @@ export class ReservationEntity {
   })
   location: string;
 
-  // CORRECTION: Utilisez CreateDateColumn
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' }) // Spécifier le nom de colonne
   @ApiProperty({
     description: 'Date de création de la réservation',
     example: '2025-03-18T10:30:00Z',
@@ -85,14 +85,14 @@ export class ReservationEntity {
     }
   }
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'timestamp', name: 'start_time' }) // Spécifier le nom de colonne
   @ApiProperty({
     description: 'Date et heure de début de la réservation',
     example: '2025-04-01T14:00:00Z',
   })
   startTime: Date;
 
-  @Column({ type: 'timestamp' })
+  @Column({ type: 'timestamp', name: 'end_time' }) // Spécifier le nom de colonne
   @ApiProperty({
     description: 'Date et heure de fin de la réservation',
     example: '2025-04-01T16:00:00Z',

@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -64,21 +66,23 @@ export class ReservationController {
   @ApiResponse({ status: 404, description: 'Réservation non trouvée.' })
   update(
     @Param('id') id: string,
-    @Body() updateReservationDto: ReservationEntity,
+    @Body() updateReservationDto: Partial<ReservationEntity>,
   ) {
     return this.reservationService.update(+id, updateReservationDto);
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT) // AJOUTER CETTE LIGNE
   @ApiOperation({ summary: 'Supprimer une réservation' })
   @ApiParam({ name: 'id', description: 'ID de la réservation' })
   @ApiResponse({
-    status: 200,
+    status: 204, // CHANGER de 200 à 204
     description: 'Réservation supprimée avec succès.',
   })
   @ApiResponse({ status: 404, description: 'Réservation non trouvée.' })
-  remove(@Param('id') id: string) {
-    return this.reservationService.remove(+id);
+  async remove(@Param('id') id: string) { // AJOUTER async
+    await this.reservationService.remove(+id); // AJOUTER await
+    // Ne pas retourner de contenu pour un 204
   }
 
   // Méthodes gRPC

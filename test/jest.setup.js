@@ -7,10 +7,11 @@ const requiredEnvVars = {
   KEYCLOAK_REALM: 'myrealm',
   KEYCLOAK_CLIENT_ID: 'myclient',
   KEYCLOAK_CLIENT_SECRET: 'mysecret',
-  KEYCLOAK_TEST_USR_USERNAME: 'testuser2@example.com',
+  // Utiliser test1 (user) et test2 (admin) selon vos utilisateurs Keycloak
+  KEYCLOAK_TEST_USR_USERNAME: 'testuser1@example.com',
   KEYCLOAK_TEST_USR_PASSWORD: 'password',
-  KEYCLOAK_TEST_ADM_USERNAME: 'admin@example.com',
-  KEYCLOAK_TEST_ADM_PASSWORD: 'admin',
+  KEYCLOAK_TEST_ADM_USERNAME: 'testuser2@example.com', // Celui qui a le rôle admin
+  KEYCLOAK_TEST_ADM_PASSWORD: 'password',
   KEYCLOAK_ADMIN_USERNAME: 'admin',
   KEYCLOAK_ADMIN_PASSWORD: 'admin',
   API_REST_URL: 'http://localhost:3000',
@@ -30,3 +31,5 @@ console.log("🔧 Variables d'environnement chargées:");
 console.log('KEYCLOAK_URL:', process.env.KEYCLOAK_URL);
 console.log('KEYCLOAK_REALM:', process.env.KEYCLOAK_REALM);
 console.log('API_REST_URL:', process.env.API_REST_URL);
+console.log('TEST_USR_USERNAME:', process.env.KEYCLOAK_TEST_USR_USERNAME);
+console.log('TEST_ADM_USERNAME:', process.env.KEYCLOAK_TEST_ADM_USERNAME);

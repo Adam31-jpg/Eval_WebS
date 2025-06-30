@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ReservationEntity } from 'src/entities/reservation.entity';
+import { NotificationEntity } from 'src/entities/notification.entity'; // AJOUTER
 import { StatusEnum } from 'src/entities/status.enum';
 import { Repository } from 'typeorm';
 import { NotificationClient } from '../../grpc/notification/notification.client';
@@ -10,6 +11,8 @@ export class ReservationService {
   constructor(
     @InjectRepository(ReservationEntity)
     private reservationRepository: Repository<ReservationEntity>,
+    @InjectRepository(NotificationEntity) // AJOUTER
+    private notificationRepository: Repository<NotificationEntity>, // AJOUTER
     private notificationClient: NotificationClient,
   ) { }
 
@@ -97,6 +100,24 @@ export class ReservationService {
   }
 
   async remove(id: number): Promise<void> {
-    await this.reservationRepository.delete(id);
+    // Vérifier que la réservation existe d'abord
+    const reservation = await this.reservationRepository.findOne({
+      where: { id: id.toString() },
+    });
+
+    if (!reservation) {
+      throw new NotFoundException(`Reservation with ID ${id} not found`);
+    }
+
+    try {
+      // Supprimer d'abord toutes les notifications liées à cette réservation
+      await this.notificationRepository.delete({ reservationId: id });
+
+      // Puis supprimer la réservation
+      await this.reservationRepository.delete(id);
+    } catch (error) {
+      console.error('Erreur lors de la suppression de la réservation:', error);
+      throw error;
+    }
   }
 }

@@ -54,7 +54,7 @@ describe('Rooms E2E Tests', () => {
   });
 
   it('should update the room', async () => {
-    const response = await axios.put(
+    const response = await axios.patch(
       `${BASE_URL}/api/rooms/${createdRoomId}`,
       {
         name: 'Updated Meeting Room',
