@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package room;
+
+service RoomService {
+  rpc Create(Room) returns (Room) {}
+  rpc FindAll(Empty) returns (Rooms) {}
+  rpc FindOne(RoomById) returns (Room) {}
+  rpc Update(UpdateRoomRequest) returns (Room) {}
+  rpc Remove(RoomById) returns (Empty) {}
+}
+
+message Empty {}
+
+message RoomById {
+  string id = 1;
+}
+
+message UpdateRoomRequest {
+  string id = 1;
+  Room room = 2;
+}
+
+message Room {
+  string id = 1;
+  string name = 2;
+  string capacity = 3;
+  string location = 4;
+  string created_at = 5;
+}
+
+message Rooms {
+  repeated Room rooms = 1;
+}
