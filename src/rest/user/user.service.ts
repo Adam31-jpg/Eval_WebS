@@ -8,14 +8,19 @@ export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
-  ) {}
+  ) { }
 
-  async create(user: UserEntity): Promise<UserEntity> {
-    return this.userRepository.save(user);
+  async create(user: Partial<UserEntity>): Promise<UserEntity> {
+    const newUser = this.userRepository.create(user);
+    return this.userRepository.save(newUser);
   }
 
-  async findAll(): Promise<UserEntity[]> {
-    return this.userRepository.find();
+  async findAll(skip: number = 0, limit: number = 10): Promise<UserEntity[]> {
+    return this.userRepository.find({
+      skip,
+      take: limit,
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async findOne(id: number): Promise<UserEntity> {
@@ -25,18 +30,20 @@ export class UserService {
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-    return user; // Ensure to return the user
+    return user;
   }
 
   async update(
     id: number,
     updateData: Partial<UserEntity>,
   ): Promise<UserEntity> {
+    const user = await this.findOne(id); // Vérifier que l'utilisateur existe
     await this.userRepository.update(id, updateData);
     return this.findOne(id);
   }
 
   async remove(id: number): Promise<void> {
+    const user = await this.findOne(id); // Vérifier que l'utilisateur existe
     await this.userRepository.delete(id);
   }
 }

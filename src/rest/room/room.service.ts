@@ -8,14 +8,18 @@ export class RoomService {
   constructor(
     @InjectRepository(RoomEntity)
     private roomRepository: Repository<RoomEntity>,
-  ) {}
+  ) { }
 
   async create(room: RoomEntity): Promise<RoomEntity> {
     return this.roomRepository.save(room);
   }
 
-  async findAll(): Promise<RoomEntity[]> {
-    return this.roomRepository.find();
+  async findAll(skip: number = 0, limit: number = 10): Promise<RoomEntity[]> {
+    return this.roomRepository.find({
+      skip,
+      take: limit,
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async findOne(id: number): Promise<RoomEntity> {
@@ -25,18 +29,20 @@ export class RoomService {
     if (!room) {
       throw new NotFoundException(`Room with ID ${id} not found`);
     }
-    return room; // Ensure to return the room
+    return room;
   }
 
   async update(
     id: number,
     updateData: Partial<RoomEntity>,
   ): Promise<RoomEntity> {
+    const room = await this.findOne(id); // Vérifier que la room existe
     await this.roomRepository.update(id, updateData);
     return this.findOne(id);
   }
 
   async remove(id: number): Promise<void> {
+    const room = await this.findOne(id); // Vérifier que la room existe
     await this.roomRepository.delete(id);
   }
 }

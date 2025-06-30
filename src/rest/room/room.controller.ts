@@ -6,16 +6,19 @@ import {
   Param,
   Patch,
   Post,
+  Query,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags, ApiQuery } from '@nestjs/swagger';
 import { RoomEntity } from 'src/entities/room.entity';
 import { RoomService } from './room.service';
 
 @ApiTags('rooms')
 @Controller('rooms')
 export class RoomController {
-  constructor(private readonly roomService: RoomService) {}
+  constructor(private readonly roomService: RoomService) { }
 
   @Post()
   @ApiOperation({ summary: 'Créer une nouvelle chambre' })
@@ -31,13 +34,20 @@ export class RoomController {
 
   @Get()
   @ApiOperation({ summary: 'Récupérer toutes les chambres' })
+  @ApiQuery({ name: 'skip', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiResponse({
     status: 200,
     description: 'Liste des chambres récupérée avec succès.',
     type: [RoomEntity],
   })
-  findAll() {
-    return this.roomService.findAll();
+  async findAll(
+    @Query('skip') skip: string = '0',
+    @Query('limit') limit: string = '10'
+  ) {
+    const rooms = await this.roomService.findAll(Number(skip), Number(limit));
+    // Retourner la structure attendue par les tests
+    return { rooms };
   }
 
   @Get(':id')
@@ -62,20 +72,22 @@ export class RoomController {
     type: RoomEntity,
   })
   @ApiResponse({ status: 404, description: 'Chambre non trouvée.' })
-  update(@Param('id') id: string, @Body() room: RoomEntity) {
+  update(@Param('id') id: string, @Body() room: Partial<RoomEntity>) {
     return this.roomService.update(+id, room);
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT) // Force le statut 204
   @ApiOperation({ summary: 'Supprimer une chambre' })
   @ApiParam({ name: 'id', description: 'ID de la chambre' })
-  @ApiResponse({ status: 200, description: 'Chambre supprimée avec succès.' })
+  @ApiResponse({ status: 204, description: 'Chambre supprimée avec succès.' })
   @ApiResponse({ status: 404, description: 'Chambre non trouvée.' })
-  remove(@Param('id') id: string) {
-    return this.roomService.remove(+id);
+  async remove(@Param('id') id: string) {
+    await this.roomService.remove(+id);
+    // Ne pas retourner de contenu pour un 204
   }
 
-  // Méthodes gRPC
+  // Méthodes gRPC inchangées...
   @GrpcMethod('RoomService', 'Create')
   grpcCreate(room: RoomEntity) {
     return this.roomService.create(room);
