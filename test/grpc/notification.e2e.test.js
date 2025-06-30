@@ -1,18 +1,56 @@
-require('dotenv').config();
-
-const { getPackage, getConfig } = require('../utils/grpc.utils.js');
-const { closePool, getPool } = require('../utils/db.utils');
-
+// Test gRPC autonome - pas de dépendance aux variables d'environnement
 const path = require('path');
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
+const { Pool } = require('pg');
 
-const grpcPackage = getPackage('notification');
-const configGrpc = getConfig();
-const notificationClient = new grpcPackage.NotificationService(
-  configGrpc.url,
-  configGrpc.insecure,
+// Configuration directe
+const PROTO_PATH = path.join(
+  __dirname,
+  '../../src/grpc/notification/notification.proto',
 );
+const GRPC_URL = 'localhost:50051';
+
+// Base de données
+const pool = new Pool({
+  host: 'localhost',
+  database: 'pgdb',
+  user: 'pguser',
+  password: 'pgpass',
+  port: 5432,
+});
+
+// Charger le proto
+console.log('Loading proto from:', PROTO_PATH);
+const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true,
+});
+
+const notificationProto = grpc.loadPackageDefinition(packageDefinition);
+
+// Debug: voir ce qui est chargé
+console.log('Loaded packages:', Object.keys(notificationProto));
+if (notificationProto.notification) {
+  console.log('notification package found');
+  console.log(
+    'Services available:',
+    Object.keys(notificationProto.notification),
+  );
+}
+
+// Créer le client
+const notificationClient =
+  new notificationProto.notification.NotificationService(
+    GRPC_URL,
+    grpc.credentials.createInsecure(),
+  );
+
+// Debug: voir les méthodes disponibles
+console.log('Client methods:', Object.getOwnPropertyNames(notificationClient));
 
 let roomId = '',
   userId = '',
@@ -21,57 +59,43 @@ let roomId = '',
 
 describe('GRPC Notification Tests', () => {
   beforeAll(async () => {
-    const pool = getPool();
-    //get user
-    // insert room, reservation, user, notification
-
-    const userRes = await pool.query(
-      `SELECT *
-       FROM "users"`,
-    );
+    // Récupérer un utilisateur existant
+    const userRes = await pool.query(`SELECT * FROM "users"`);
     const userRows = userRes.rows;
-    expect(userRows).toBeDefined();
     expect(userRows.length).toBeGreaterThanOrEqual(1);
-    const user = userRows[0];
-    userId = user.id;
+    userId = userRows[0].id;
 
-    const roomRes = await pool.query(
-      `INSERT INTO rooms (name, capacity, location, created_at)
-       VALUES ('Test', 10, 'Second floor', NOW())
-       RETURNING *`,
-    );
-    const roomRows = roomRes.rows;
-    expect(roomRows).toBeDefined();
+    // Récupérer une room existante
+    const roomRes = await pool.query(`SELECT * FROM rooms LIMIT 1`);
+    roomId = roomRes.rows[0].id;
 
-    expect(roomRows.length).toBe(1);
-    const room = roomRows[0];
-    roomId = room.id;
-
+    // Créer une réservation
     const reservationRes = await pool.query(
-      `INSERT INTO reservations ("user_id", "room_id", "start_time", "end_time", status, created_at)
-       VALUES ($1, $2, NOW(), NOW(), 'pending', NOW())
+      `INSERT INTO reservations (user_id, room_id, start_time, end_time, status, location, created_at)
+       VALUES ($1, $2, NOW(), NOW() + INTERVAL '2 hours', 'PENDING', 'Test location gRPC', NOW())
        RETURNING *`,
-      [user.id, room.id],
+      [userId, roomId],
     );
-    const reservationRows = reservationRes.rows;
-    expect(reservationRows).toBeDefined();
-    expect(reservationRows.length).toBe(1);
-    const reservation = reservationRows[0];
-    reservationId = reservation.id;
+    reservationId = reservationRes.rows[0].id;
+  });
 
-    await closePool();
+  afterAll(async () => {
+    await pool.end();
   });
 
   it('should create a notification', async () => {
     const notification = {
-      reservationId: reservationId,
+      reservationId: parseInt(reservationId),
       message: 'Hello World',
       notificationDate: new Date().toISOString(),
+      isSent: false,
     };
+
     const createNotification = (notification) => {
       return new Promise((resolve, reject) => {
-        notificationClient.CreateNotification(notification, (err, response) => {
+        notificationClient.Create(notification, (err, response) => {
           if (err) {
+            console.error('gRPC Create error:', err);
             reject(err);
           } else {
             resolve(response);
@@ -80,48 +104,19 @@ describe('GRPC Notification Tests', () => {
       });
     };
 
-    // Usage
     const response = await createNotification(notification);
     expect(response).toHaveProperty('id');
-    expect(response.reservationId).toBe(reservationId);
+    expect(response.reservationId).toBe(parseInt(reservationId));
     expect(response.message).toBe('Hello World');
     notificationId = response.id;
   });
 
-  it('should update a notification', async () => {
-    const notification = {
-      id: notificationId,
-      message: 'World Hello',
-      notificationDate: new Date().toISOString(),
-    };
-
-    const updateNotification = (notification) => {
-      return new Promise((resolve, reject) => {
-        notificationClient.UpdateNotification(notification, (err, response) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(response);
-          }
-        });
-      });
-    };
-
-    // Usage
-    const response = await updateNotification(notification);
-    expect(response).toHaveProperty('id');
-    expect(response.message).toBe('World Hello');
-  });
-
   it('should get a notification by ID', async () => {
-    const notification = {
-      id: notificationId,
-    };
-
     const getNotification = (notification) => {
       return new Promise((resolve, reject) => {
-        notificationClient.GetNotification(notification, (err, response) => {
+        notificationClient.FindOne(notification, (err, response) => {
           if (err) {
+            console.error('gRPC FindOne error:', err);
             reject(err);
           } else {
             resolve(response);
@@ -130,9 +125,38 @@ describe('GRPC Notification Tests', () => {
       });
     };
 
-    // Usage
-    const response = await getNotification(notification);
+    const response = await getNotification({ id: notificationId });
     expect(response).toHaveProperty('id');
     expect(response.id).toBe(notificationId);
+  });
+
+  it('should update a notification', async () => {
+    const updateNotification = (data) => {
+      return new Promise((resolve, reject) => {
+        notificationClient.Update(data, (err, response) => {
+          if (err) {
+            console.error('gRPC Update error:', err);
+            reject(err);
+          } else {
+            resolve(response);
+          }
+        });
+      });
+    };
+
+    const updateData = {
+      id: notificationId,
+      notification: {
+        id: notificationId,
+        reservationId: parseInt(reservationId),
+        message: 'World Hello Updated',
+        notificationDate: new Date().toISOString(),
+        isSent: true,
+      },
+    };
+
+    const response = await updateNotification(updateData);
+    expect(response).toHaveProperty('id');
+    expect(response.message).toBe('World Hello Updated');
   });
 });
