@@ -28,12 +28,13 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.GRPC,
     options: {
-      package: ['user', 'room', 'reservation', 'notification'],
+      package: ['user', 'room', 'reservation', 'notification', 'extract'],
       protoPath: [
         join(__dirname, '../src/grpc/user/user.proto'),
         join(__dirname, '../src/grpc/room/room.proto'),
         join(__dirname, '../src/grpc/reservation/reservation.proto'),
         join(__dirname, '../src/grpc/notification/notification.proto'),
+        join(__dirname, '../src/grpc/extract/extract.proto'),
       ],
       url: '0.0.0.0:50051', // Port gRPC différent du port HTTP
     },

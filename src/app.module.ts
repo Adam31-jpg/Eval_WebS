@@ -16,6 +16,8 @@ import { UserService } from './rest/user/user.service';
 import { GraphQLAppModule } from './graphql/graphql.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ExtractClient } from './grpc/extract/extract.client';
+import { MinioService } from './services/minio.service';
 const configService = new ConfigService();
 @Module({
   imports: [
@@ -46,6 +48,8 @@ const configService = new ConfigService();
     ReservationService,
     NotificationService,
     NotificationClient,
+    ExtractClient,
+    MinioService,
   ],
 
 })
