@@ -6,75 +6,77 @@ import {
   ObjectType,
   Field,
   ID,
+  Int,
 } from '@nestjs/graphql';
 
 import { ReservationEntity } from '../../entities/reservation.entity';
-import { StatusEnum } from '../../entities/status.enum';
-import { RoomType } from './room.resolver';
-import { UserType } from './user.resolver';
 import { Observable } from 'rxjs';
-import { CreateReservationInput } from './dto/create-reservation.input';
 import { ReservationService } from '../services/reservation.service';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '../../auth/gq-auth.guard';
+import { CreateReservationInput } from './dto/create-reservation.input';
 
 @ObjectType()
 export class ReservationType {
   @Field(() => ID) id: string;
-  @Field() start_time: string;
-  @Field() end_time: string;
-  @Field() status: StatusEnum;
-  @Field() location: string;
-  @Field() created_at: string;
-  @Field(() => RoomType, {
-    nullable: true,
-  })
-  room: RoomType;
-  @Field(() => UserType, {
-    nullable: true,
-  })
-  user: UserType;
+  @Field() userId: string;        // ← AJOUTÉ
+  @Field() roomId: string;        // ← AJOUTÉ  
+  @Field() startTime: string;     // ← CHANGÉ de start_time
+  @Field() endTime: string;       // ← CHANGÉ de end_time
+  @Field() createdAt: string;     // ← CHANGÉ de created_at
 }
 
 @Resolver(() => ReservationType)
 export class ReservationResolver {
-  constructor(private readonly reservationService: ReservationService) {}
+  constructor(private readonly reservationService: ReservationService) { }
 
   @Query(() => [ReservationType])
   @UseGuards(GqlAuthGuard)
   listReservations(
-    @Args('skip') skip: number,
-    @Args('limit') limit: number,
+    @Args('skip', { type: () => Int, nullable: true }) skip: number,    // ← AJOUTÉ type Int
+    @Args('limit', { type: () => Int, nullable: true }) limit: number,  // ← AJOUTÉ type Int
   ): Observable<ReservationEntity[]> {
     return this.reservationService.listReservations(skip, limit);
   }
 
   @Query(() => ReservationType, { nullable: true })
   @UseGuards(GqlAuthGuard)
-  room(@Args('id') id: string): Observable<ReservationEntity> {
+  reservation(@Args('id', { type: () => ID }) id: string): Observable<ReservationEntity> {  // ← CHANGÉ nom + type ID
     return this.reservationService.reservation(id);
+  }
+
+  createReservation(
+    @Args('userId', { type: () => Int }) userId: number,  // ← Direct en number
+    @Args('roomId', { type: () => Int }) roomId: number,  // ← Direct en number
+    @Args('startTime') startTime: string,
+    @Args('endTime') endTime: string,
+  ): Observable<ReservationEntity> {
+    return this.reservationService.createReservation({
+      userId, roomId, startTime, endTime
+    });
   }
 
   @Mutation(() => ReservationType)
   @UseGuards(GqlAuthGuard)
-  createReservation(
-    @Args('input') input: CreateReservationInput,
+  updateReservation(
+    @Args('id', { type: () => ID }) id: string,
+    @Args('userId', { nullable: true, type: () => Int }) userId?: number,    // ← CHANGÉ en number
+    @Args('roomId', { nullable: true, type: () => Int }) roomId?: number,    // ← CHANGÉ en number
+    @Args('startTime', { nullable: true }) startTime?: string,
+    @Args('endTime', { nullable: true }) endTime?: string,
   ): Observable<ReservationEntity> {
-    return this.reservationService.createReservation(input);
-  }
-
-  @Mutation(() => RoomType)
-  @UseGuards(GqlAuthGuard)
-  updateRoom(
-    @Args('id') id: string,
-    @Args('input') input: CreateReservationInput,
-  ): Observable<ReservationEntity> {
+    const input: Partial<CreateReservationInput> = {
+      userId,
+      roomId,
+      startTime,
+      endTime
+    };
     return this.reservationService.updateReservation(id, input);
   }
 
   @Mutation(() => Boolean)
   @UseGuards(GqlAuthGuard)
-  deleteRoom(@Args('id') id: string): Observable<boolean> {
+  deleteReservation(@Args('id', { type: () => ID }) id: string): Observable<boolean> {  // ← CHANGÉ nom
     return this.reservationService.deleteReservation(id);
   }
 }

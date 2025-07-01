@@ -2,13 +2,13 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type RoomType {
+type ReservationType {
   id: ID!
-  name: String!
-  capacity: String!
-  location: String!
-  created_at: String!
-  reservations: [ReservationType!]
+  userId: String!
+  roomId: String!
+  startTime: String!
+  endTime: String!
+  createdAt: String!
 }
 
 type accessTokenType {
@@ -23,41 +23,28 @@ type UserType {
   reservations: [ReservationType!]
 }
 
-type ReservationType {
+type RoomType {
   id: ID!
-  start_time: String!
-  end_time: String!
-  status: String!
+  name: String!
+  capacity: Int!
   location: String!
   created_at: String!
-  room: RoomType
-  user: UserType
+  reservations: [ReservationType!]
 }
 
 type Query {
-  listReservations(skip: Float!, limit: Float!): [ReservationType!]!
-  room(id: String!): RoomType
+  listReservations(skip: Int, limit: Int): [ReservationType!]!
+  reservation(id: ID!): ReservationType
   listUsers(skip: Float!, limit: Float!): [UserType!]!
+  room(id: ID!): RoomType
   login(email: String!, password: String!): accessTokenType!
-  listRooms(skip: Float!, limit: Float!): [RoomType!]!
+  listRooms(skip: Int, limit: Int): [RoomType!]!
 }
 
 type Mutation {
-  createReservation(input: CreateReservationInput!): ReservationType!
-  updateRoom(id: String!, input: CreateRoomInput!): RoomType!
-  deleteRoom(id: String!): Boolean!
-  createRoom(input: CreateRoomInput!): RoomType!
-}
-
-input CreateReservationInput {
-  start_time: String!
-  end_time: String!
-  status: String!
-  location: String!
-}
-
-input CreateRoomInput {
-  name: String!
-  capacity: Float!
-  location: String!
+  updateReservation(id: ID!, userId: Int, roomId: Int, startTime: String, endTime: String): ReservationType!
+  deleteReservation(id: ID!): Boolean!
+  createRoom(name: String!, capacity: Int!, location: String!): RoomType!
+  updateRoom(id: ID!, name: String, capacity: Int, location: String): RoomType!
+  deleteRoom(id: ID!): Boolean!
 }

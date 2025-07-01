@@ -1,10 +1,9 @@
-import { InputType, Field } from '@nestjs/graphql';
-import { StatusEnum } from '../../../entities/status.enum';
+import { InputType, Field, Int } from '@nestjs/graphql';
 
 @InputType()
 export class CreateReservationInput {
-  @Field() start_time: string;
-  @Field() end_time: string;
-  @Field() status: StatusEnum;
-  @Field() location: string;
+  @Field(() => Int) userId: number;    // ← CHANGÉ en number avec Int
+  @Field(() => Int) roomId: number;    // ← CHANGÉ en number avec Int
+  @Field() startTime: string;
+  @Field() endTime: string;
 }

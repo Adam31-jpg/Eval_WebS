@@ -10,7 +10,7 @@ export class ReservationService {
   constructor(
     @InjectRepository(ReservationEntity)
     private readonly reservationRepository: Repository<ReservationEntity>,
-  ) {}
+  ) { }
 
   listReservations(
     skip: number,
@@ -43,7 +43,7 @@ export class ReservationService {
 
   updateReservation(
     id: string,
-    input: CreateReservationInput,
+    input: Partial<CreateReservationInput>,  // ← CHANGÉ
   ): Observable<ReservationEntity> {
     return this.reservation(id).pipe(
       switchMap(() => this.reservationRepository.update(id, input)),

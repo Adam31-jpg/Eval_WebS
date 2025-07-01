@@ -146,6 +146,12 @@ function getAdminToken() {
   return keycloakAdminToken;
 }
 
+// AJOUT: Export de getToken pour la compatibilité avec les tests GraphQL
+function getToken() {
+  // Retourne le token utilisateur par défaut
+  return keycloakUsrAccessToken;
+}
+
 /**
  * Vérifie le token JWT
  */
@@ -213,5 +219,6 @@ module.exports = {
   getUsrToken,
   getAdmToken,
   getAdminToken,
+  getToken, // AJOUT: Export de getToken
   verifyJwtToken,
 };
