@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "test:grpc": "jest test/grpc/notification.e2e.test.js",
     "test:rest": "jest test/rest/",
+    "test:graphql": "jest test/api-graphql/",
     "postbuild": "mkdir -p dist/grpc/notification dist/grpc/reservation && cp src/grpc/notification/notification.proto dist/grpc/notification/ && cp src/grpc/reservation/reservation.proto dist/grpc/reservation/"
   },
   "dependencies": {
