@@ -15,6 +15,7 @@ import { AuthModule } from '../auth/auth.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
+import { NotificationClient } from 'src/grpc/notification/notification.client';
 @Module({
   imports: [
     forwardRef(() => AuthModule),
@@ -38,7 +39,8 @@ import { join } from 'path';
     ReservationResolver,
     UserResolver,
     RoomResolver,
+    NotificationClient
   ],
   exports: [UserService],
 })
-export class GraphQLAppModule {}
+export class GraphQLAppModule { }

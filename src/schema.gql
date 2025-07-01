@@ -42,6 +42,7 @@ type Query {
 }
 
 type Mutation {
+  createReservation(userId: Int!, roomId: Int!, startTime: String!, endTime: String!): ReservationType!
   updateReservation(id: ID!, userId: Int, roomId: Int, startTime: String, endTime: String): ReservationType!
   deleteReservation(id: ID!): Boolean!
   createRoom(name: String!, capacity: Int!, location: String!): RoomType!

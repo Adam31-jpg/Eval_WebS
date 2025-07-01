@@ -34,7 +34,7 @@ export class RoomResolver {
 
   @Query(() => RoomType, { nullable: true })
   @UseGuards(GqlAuthGuard)
-  room(@Args('id', { type: () => ID }) id: string): Observable<RoomEntity> {
+  room(@Args('id', { type: () => ID }) id: string): Observable<RoomEntity | null> {
     return this.roomService.room(id);
   }
 

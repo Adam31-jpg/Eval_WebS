@@ -2,8 +2,8 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RoomEntity } from '../../entities/room.entity';
-import { from, map, Observable, switchMap, tap } from 'rxjs';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { catchError, from, map, Observable, of, switchMap } from 'rxjs';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class RoomService {
@@ -22,13 +22,14 @@ export class RoomService {
     );
   }
 
-  room(id: string): Observable<RoomEntity> {
+  room(id: string): Observable<RoomEntity | null> {
     return from(this.roomRepository.findOne({ where: { id } })).pipe(
-      tap((room: RoomEntity) => {
-        if (!room) {
-          throw new NotFoundException();
-        }
+      map((room: RoomEntity | null) => {
+        return room;
       }),
+      catchError(() => {
+        return of(null);
+      })
     );
   }
 
