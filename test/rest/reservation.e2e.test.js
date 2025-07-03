@@ -159,42 +159,103 @@ describe('Reservations E2E Tests', () => {
   });
 
   // SKIP le test CSV pour l'instant car l'endpoint n'existe pas
-  it.skip('should extract as csv and get the url of the file', async () => {
+  it('should extract as csv and get the url of the file', async () => {
+    console.log(`📊 Test d'extraction CSV pour l'utilisateur: ${userId}`);
+
     try {
       const response = await axios.post(
         `${BASE_URL}/api/users/${userId}/extract`,
-        {},
+        {}, // Body vide car l'endpoint ne nécessite pas de données
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         },
       );
+
+      console.log(`✅ Réponse d'extraction:`, response.data);
+
       expect(response.status).toBe(201);
       expect(response.data).toHaveProperty('url');
+      expect(response.data.url).toMatch(/^https?:\/\//); // Vérifier que c'est une URL valide
+      expect(response.data.url).toContain('.csv'); // Vérifier que c'est un fichier CSV
 
       const url = response.data.url;
-      const file = await axios.get(url);
-      expect(file.status).toBe(200);
+      console.log(`🔗 URL du fichier CSV: ${url}`);
 
+      // Télécharger et vérifier le contenu du fichier CSV
+      const fileResponse = await axios.get(url);
+      expect(fileResponse.status).toBe(200);
+      expect(fileResponse.headers['content-type']).toContain('text/csv');
+
+      const csvContent = fileResponse.data;
+      console.log(
+        `📄 Contenu CSV (preview): ${csvContent.substring(0, 200)}...`,
+      );
+
+      // Vérifier les en-têtes CSV (format snake_case)
+      expect(csvContent).toContain('reservation_id');
+      expect(csvContent).toContain('user_id');
+      expect(csvContent).toContain('room_id');
+      expect(csvContent).toContain('start_time');
+      expect(csvContent).toContain('end_time');
+      expect(csvContent).toContain('status');
+      expect(csvContent).toContain('location');
+      expect(csvContent).toContain('created_at');
+
+      // Vérifier que les données de la réservation créée sont présentes
+      expect(csvContent).toContain(String(createdReservationId));
+      expect(csvContent).toContain(String(userId));
+      expect(csvContent).toContain(String(createdRoomId));
+
+      // Parser le CSV pour vérifier la structure des données
       const fileStream = new Readable();
-      fileStream.push(file.data);
+      fileStream.push(csvContent);
       fileStream.push(null);
 
       const results = [];
-      fileStream
-        .pipe(csv())
-        .on('data', (data) => results.push(data))
-        .on('end', () => {
-          expect(results.length).toBeGreaterThan(0);
-          expect(results[0]).toHaveProperty('reservationId');
-          expect(results[0]).toHaveProperty('userId');
-          expect(results[0]).toHaveProperty('roomId');
-          expect(results[0]).toHaveProperty('startTime');
-          expect(results[0]).toHaveProperty('endTime');
-          expect(results[0]).toHaveProperty('status');
-        });
+
+      await new Promise((resolve, reject) => {
+        fileStream
+          .pipe(csv())
+          .on('data', (data) => {
+            console.log(`📋 Ligne CSV parsée:`, data);
+            results.push(data);
+          })
+          .on('end', () => {
+            try {
+              expect(results.length).toBeGreaterThan(0);
+
+              // CORRECTION: Vérifier les propriétés au format snake_case (comme dans le CSV)
+              expect(results[0]).toHaveProperty('reservation_id'); // au lieu de 'reservationId'
+              expect(results[0]).toHaveProperty('user_id'); // au lieu de 'userId'
+              expect(results[0]).toHaveProperty('room_id'); // au lieu de 'roomId'
+              expect(results[0]).toHaveProperty('start_time'); // au lieu de 'startTime'
+              expect(results[0]).toHaveProperty('end_time'); // au lieu de 'endTime'
+              expect(results[0]).toHaveProperty('status');
+              expect(results[0]).toHaveProperty('location');
+              expect(results[0]).toHaveProperty('created_at'); // au lieu de 'createdAt'
+
+              console.log(
+                `✅ Structure CSV validée avec ${results.length} lignes`,
+              );
+              resolve();
+            } catch (error) {
+              reject(error);
+            }
+          })
+          .on('error', (error) => {
+            console.error(`❌ Erreur lors du parsing CSV:`, error);
+            reject(error);
+          });
+      });
+
+      console.log(`✅ Test d'extraction CSV réussi`);
     } catch (err) {
+      console.error(
+        `❌ Erreur lors du test d'extraction CSV:`,
+        err.response?.data || err.message,
+      );
       throw err;
     }
   });

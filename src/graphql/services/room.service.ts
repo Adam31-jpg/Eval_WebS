@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RoomEntity } from '../../entities/room.entity';
 import { catchError, from, map, Observable, of, switchMap } from 'rxjs';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class RoomService {
@@ -15,9 +15,9 @@ export class RoomService {
   listRooms(skip: number, limit: number): Observable<RoomEntity[]> {
     return from(
       this.roomRepository.find({
-        // relations: ['reservations'],
-        skip: skip,
-        take: limit,
+        skip: skip || 0,
+        take: limit || 10,
+        order: { createdAt: 'DESC' },
       }),
     );
   }
@@ -39,8 +39,19 @@ export class RoomService {
 
   updateRoom(id: string, input: { name?: string; capacity?: number; location?: string }): Observable<RoomEntity> {
     return this.room(id).pipe(
-      switchMap(() => this.roomRepository.update(id, input)),
-      switchMap(() => this.roomRepository.findOneOrFail({ where: { id } })),
+      switchMap((existingRoom) => {
+        if (!existingRoom) {
+          throw new NotFoundException(`Room with ID ${id} not found`);
+        }
+
+        // CORRECTION: Utiliser save() au lieu de update() pour forcer un refresh
+        const updatedRoom = { ...existingRoom, ...input };
+        return from(this.roomRepository.save(updatedRoom));
+      }),
+      catchError((error) => {
+        console.error('❌ Erreur lors de la mise à jour de la room:', error);
+        throw error;
+      })
     );
   }
 

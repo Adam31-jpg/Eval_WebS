@@ -55,6 +55,5 @@ const configService = new ConfigService();
     ExtractService,
     MinioService,
   ],
-
 })
 export class AppModule { }

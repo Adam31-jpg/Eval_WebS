@@ -26,7 +26,8 @@ export class ReservationService {
       this.reservationRepository.find({
         relations: [],
         skip: skip || 0,
-        take: limit || 10
+        take: limit || 10,
+        order: { createdAt: 'DESC' }, // AJOUT: Ordre pour avoir les plus récentes en premier
       }),
     );
   }
@@ -94,8 +95,8 @@ export class ReservationService {
           throw new NotFoundException(`Reservation with ID ${id} not found`);
         }
 
-        // Convertir les strings en dates si nécessaire
-        const updateData: any = {};
+        // Convertir les strings en dates si nécessaire et préparer les données de mise à jour
+        const updateData: any = { ...existingReservation };
 
         if (input.userId !== undefined) updateData.userId = input.userId;
         if (input.roomId !== undefined) updateData.roomId = input.roomId;
@@ -106,11 +107,9 @@ export class ReservationService {
           updateData.endTime = new Date(input.endTime);
         }
 
-        return from(this.reservationRepository.update(id, updateData));
+        // CORRECTION: Utiliser save() au lieu de update() pour forcer un refresh
+        return from(this.reservationRepository.save(updateData));
       }),
-      switchMap(() =>
-        this.reservationRepository.findOneOrFail({ where: { id } }),
-      ),
       // Créer une notification de mise à jour via gRPC
       tap((updatedReservation) => {
         const notificationRequest = {

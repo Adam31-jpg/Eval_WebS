@@ -19,11 +19,14 @@ import { GrpcMethod } from '@nestjs/microservices';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { UserEntity } from '../../entities/user.entity';
 import { UserService } from './user.service';
+import { ExtractClient } from 'src/grpc/extract/extract.client';
 
 @ApiTags('users')
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService,
+    private readonly extractClient: ExtractClient
+  ) { }
 
   @Post()
   @UseGuards(AuthGuard('jwt'))
@@ -120,6 +123,52 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé.' })
   findOne(@Param('id') id: string) {
     return this.userService.findOne(+id);
+  }
+
+  @Post(':id/extract')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Générer une extraction CSV des réservations de l\'utilisateur' })
+  @ApiParam({ name: 'id', description: "ID de l'utilisateur" })
+  @ApiResponse({
+    status: 201,
+    description: 'URL d\'extraction générée avec succès.',
+    schema: {
+      type: 'object',
+      properties: {
+        url: {
+          type: 'string',
+          description: 'URL présignée pour télécharger le fichier CSV'
+        }
+      }
+    }
+  })
+  @ApiResponse({ status: 404, description: 'Utilisateur non trouvé.' })
+  @ApiResponse({ status: 401, description: 'Token manquant ou invalide.' })
+  async extractUserReservations(@Param('id') id: string): Promise<{ url: string }> {
+    console.log(`📊 Demande d'extraction CSV pour l'utilisateur: ${id}`);
+
+    try {
+      // Vérifier que l'utilisateur existe
+      await this.userService.findOne(+id);
+
+      // Appeler le service d'extraction via gRPC
+      return new Promise((resolve, reject) => {
+        this.extractClient.generateUserExtract(+id).subscribe({
+          next: (result) => {
+            console.log(`✅ Extraction CSV générée pour l'utilisateur ${id}:`, result.url);
+            resolve({ url: result.url });
+          },
+          error: (error) => {
+            console.error(`❌ Erreur lors de l'extraction CSV pour l'utilisateur ${id}:`, error);
+            reject(error);
+          }
+        });
+      });
+    } catch (error) {
+      console.error(`❌ Erreur dans extractUserReservations pour l'utilisateur ${id}:`, error);
+      throw error;
+    }
   }
 
   @Patch(':id')
