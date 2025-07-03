@@ -5,7 +5,10 @@ const { closePool, getPool } = require('../utils/db.utils');
 const axios = require('axios');
 
 // Charger directement le proto extract
-const PROTO_PATH = path.join(__dirname, '../../src/grpc/extract/extract.proto');
+const PROTO_PATH = path.join(
+  __dirname,
+  '../../src/grpc-service/extract/extract.proto',
+);
 const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
   keepCase: true,
   longs: String,

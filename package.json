@@ -21,7 +21,7 @@
     "test:grpc": "jest test/grpc/",
     "test:rest": "jest test/rest/",
     "test:graphql": "jest test/api-graphql/",
-    "postbuild": "mkdir -p dist/grpc/notification dist/grpc/reservation && cp src/grpc/notification/notification.proto dist/grpc/notification/ && cp src/grpc/reservation/reservation.proto dist/grpc/reservation/"
+    "postbuild": "mkdir -p dist/grpc-service/notification dist/grpc-service/reservation && cp src/grpc-service/notification/notification.proto dist/grpc-service/notification/ && cp src/grpc-service/reservation/reservation.proto dist/grpc-service/reservation/"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.13.3",

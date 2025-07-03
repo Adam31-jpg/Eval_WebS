@@ -4,7 +4,7 @@ import { ReservationEntity } from 'src/entities/reservation.entity';
 import { NotificationEntity } from 'src/entities/notification.entity'; // AJOUTER
 import { StatusEnum } from 'src/entities/status.enum';
 import { Repository } from 'typeorm';
-import { NotificationClient } from '../../grpc/notification/notification.client';
+import { NotificationClient } from '../../grpc-service/notification/notification.client';
 
 @Injectable()
 export class ReservationService {

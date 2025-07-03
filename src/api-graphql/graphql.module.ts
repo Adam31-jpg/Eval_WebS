@@ -15,7 +15,7 @@ import { AuthModule } from '../auth/auth.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
-import { NotificationClient } from 'src/grpc/notification/notification.client';
+import { NotificationClient } from 'src/grpc-service/notification/notification.client';
 @Module({
   imports: [
     forwardRef(() => AuthModule),

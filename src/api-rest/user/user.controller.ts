@@ -19,7 +19,7 @@ import { GrpcMethod } from '@nestjs/microservices';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { UserEntity } from '../../entities/user.entity';
 import { UserService } from './user.service';
-import { ExtractClient } from 'src/grpc/extract/extract.client';
+import { ExtractClient } from 'src/grpc-service/extract/extract.client';
 
 @ApiTags('users')
 @Controller('users')

@@ -7,7 +7,7 @@ const { Pool } = require('pg');
 // Configuration directe
 const PROTO_PATH = path.join(
   __dirname,
-  '../../src/grpc/notification/notification.proto',
+  '../../src/grpc-service/notification/notification.proto',
 );
 const GRPC_URL = 'localhost:50051';
 

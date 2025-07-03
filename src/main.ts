@@ -30,11 +30,11 @@ async function bootstrap() {
     options: {
       package: ['user', 'room', 'reservation', 'notification', 'extract'],
       protoPath: [
-        join(__dirname, '../src/grpc/user/user.proto'),
-        join(__dirname, '../src/grpc/room/room.proto'),
-        join(__dirname, '../src/grpc/reservation/reservation.proto'),
-        join(__dirname, '../src/grpc/notification/notification.proto'),
-        join(__dirname, '../src/grpc/extract/extract.proto'),
+        join(__dirname, '../src/grpc-service/user/user.proto'),
+        join(__dirname, '../src/grpc-service/room/room.proto'),
+        join(__dirname, '../src/grpc-service/reservation/reservation.proto'),
+        join(__dirname, '../src/grpc-service/notification/notification.proto'),
+        join(__dirname, '../src/grpc-service/extract/extract.proto'),
       ],
       url: '0.0.0.0:50051', // Port gRPC différent du port HTTP
     },

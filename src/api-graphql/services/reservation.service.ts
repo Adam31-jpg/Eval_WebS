@@ -6,7 +6,7 @@ import { CreateReservationInput } from '../resolvers/dto/create-reservation.inpu
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { StatusEnum } from '../../entities/status.enum';
-import { NotificationClient } from '../../grpc/notification/notification.client';
+import { NotificationClient } from '../../grpc-service/notification/notification.client';
 
 @Injectable()
 export class ReservationService {
