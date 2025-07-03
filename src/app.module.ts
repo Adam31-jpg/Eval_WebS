@@ -18,6 +18,8 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ExtractClient } from './grpc/extract/extract.client';
 import { MinioService } from './services/minio.service';
+import { ExtractController } from './grpc/extract/extract.controller';
+import { ExtractService } from './grpc/extract/extract.service';
 const configService = new ConfigService();
 @Module({
   imports: [
@@ -41,6 +43,7 @@ const configService = new ConfigService();
     RoomController,
     ReservationController,
     NotificationController,
+    ExtractController,
   ],
   providers: [
     UserService,
@@ -49,6 +52,7 @@ const configService = new ConfigService();
     NotificationService,
     NotificationClient,
     ExtractClient,
+    ExtractService,
     MinioService,
   ],
 
