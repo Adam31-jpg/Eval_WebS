@@ -34,7 +34,6 @@ export class ReservationService {
       throw new Error('endTime est requis pour créer une réservation');
     }
 
-    // CORRECTION: Créer l'objet réservation avec toutes les données nécessaires
     const reservation = this.reservationRepository.create({
       userId: parseInt(reservationData.user_id.toString()),
       roomId: parseInt(reservationData.room_id.toString()),
