@@ -1,4 +1,46 @@
 # Eval_WebS
+
+#A savoir
+
+j'ai tout fait dans la même application
+le port de graphql est le 3000
+
+Voici le fichier env 
+
+```bash
+KEYCLOAK_URL=http://localhost:8080
+KEYCLOAK_REALM=myrealm
+KEYCLOAK_CLIENT_ID=myclient
+KEYCLOAK_CLIENT_SECRET=mysecret
+KEYCLOAK_TEST_USERNAME=testuser2@example.com
+KEYCLOAK_TEST_PASSWORD=password
+KEYCLOAK_ADMIN_USERNAME=admin
+KEYCLOAK_ADMIN_PASSWORD=admin
+
+API_REST_URL="http://localhost:3000"
+API_GRAPHQL_URL="http://localhost:3000/graphql"
+
+PROTO_PATH="src/grpc-service/spec.proto"
+PROTO_URL="localhost:50051"
+
+# MinIO Configuration
+MINIO_ENDPOINT=localhost
+MINIO_PORT=9000
+MINIO_USE_SSL=false
+MINIO_ROOT_USER=minioadmin
+MINIO_ROOT_PASSWORD=minioadmin
+MINIO_EXTERNAL_ENDPOINT=localhost
+MINIO_EXTERNAL_PORT=9000
+
+# Pour le développement local, utilise localhost
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=pguser
+DB_PASSWORD=pgpass
+DB_NAME=pgdb
+```
+
+
 # Comment lancer et tester le projet Eval_WebS
 
 Ce guide explique comment démarrer l'environnement de développement et exécuter les tests du projet.
