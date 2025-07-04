@@ -3,12 +3,11 @@ import {
   Controller,
   Delete,
   Get,
-  Param,
-  Patch,
-  Post,
+  Param, Post,
   Query,
   HttpCode,
   HttpStatus,
+  Put
 } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags, ApiQuery } from '@nestjs/swagger';
@@ -63,7 +62,7 @@ export class RoomController {
     return this.roomService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   @ApiOperation({ summary: 'Mettre à jour une chambre' })
   @ApiParam({ name: 'id', description: 'ID de la chambre' })
   @ApiResponse({

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('users')
 export class UserEntity {
@@ -29,5 +29,12 @@ export class UserEntity {
     description: 'Date de création du compte',
     example: '2025-03-18T10:30:00Z',
   })
-  createdAt: Date;
+  created_at: Date;
+
+  @UpdateDateColumn()
+  @ApiProperty({
+    description: 'Date de modification du compte',
+    example: '2025-03-18T10:30:00Z',
+  })
+  updated_at: Date;
 }

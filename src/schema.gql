@@ -4,11 +4,13 @@
 
 type ReservationType {
   id: ID!
-  userId: String!
-  roomId: String!
+  userId: Int!
+  roomId: Int!
   startTime: String!
   endTime: String!
   createdAt: String!
+  location: String
+  status: String
 }
 
 type accessTokenType {
@@ -33,7 +35,7 @@ type RoomType {
 }
 
 type Query {
-  listReservations(skip: Int, limit: Int): [ReservationType!]!
+  listReservations(skip: Int = 0, limit: Int = 10): [ReservationType!]!
   reservation(id: ID!): ReservationType
   listUsers(skip: Float!, limit: Float!): [UserType!]!
   room(id: ID!): RoomType
@@ -42,10 +44,24 @@ type Query {
 }
 
 type Mutation {
-  createReservation(userId: Int!, roomId: Int!, startTime: String!, endTime: String!): ReservationType!
-  updateReservation(id: ID!, userId: Int, roomId: Int, startTime: String, endTime: String): ReservationType!
+  createReservation(input: CreateReservationInput!): ReservationType!
+  updateReservation(id: ID!, input: UpdateReservationInput!): ReservationType!
   deleteReservation(id: ID!): Boolean!
   createRoom(name: String!, capacity: Int!, location: String!): RoomType!
   updateRoom(id: ID!, name: String, capacity: Int, location: String): RoomType!
   deleteRoom(id: ID!): Boolean!
+}
+
+input CreateReservationInput {
+  userId: Int!
+  roomId: Int!
+  startTime: String!
+  endTime: String!
+}
+
+input UpdateReservationInput {
+  userId: Int
+  roomId: Int
+  startTime: String
+  endTime: String
 }
