@@ -26,15 +26,15 @@ export class RoomEntity {
   })
   capacity: number;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   @ApiProperty({
     description: 'Localisation de la chambre',
     example: 'Aile Est, 3ème étage',
+    required: false,
   })
-  location: string;
+  location?: string;
 
-  // CORRECTION: Utilisez CreateDateColumn au lieu de Column
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   @ApiProperty({
     description: 'Date de création',
     example: '2025-03-18T10:30:00Z',

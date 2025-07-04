@@ -63,12 +63,13 @@ export class ReservationEntity {
   })
   room?: RoomEntity;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   @ApiProperty({
     description: 'Localisation de la réservation',
     example: 'Bâtiment A, Paris',
+    required: false,
   })
-  location: string;
+  location?: string;
 
   @CreateDateColumn({ name: 'created_at' }) // Spécifier le nom de colonne
   @ApiProperty({

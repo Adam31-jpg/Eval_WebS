@@ -1,3 +1,4 @@
+// src/grpc/extract/extract.service.ts
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -27,7 +28,7 @@ export class ExtractService {
 
             this.logger.log(`${reservations.length} réservations trouvées pour l'utilisateur ${userId}`);
 
-            // 2. Générer le contenu CSV
+            // 2. Générer le contenu CSV avec format camelCase
             const csvContent = this.generateCsvContent(reservations);
 
             // 3. Créer le nom de fichier unique
@@ -50,39 +51,39 @@ export class ExtractService {
     }
 
     private generateCsvContent(reservations: ReservationEntity[]): string {
-        // En-têtes CSV
+        // CORRECTION: En-têtes CSV en camelCase (comme attendu par le test)
         const headers = [
-            'reservation_id',
-            'user_id',
-            'room_id',
-            'start_time',
-            'end_time',
+            'reservationId',  // au lieu de 'reservation_id'
+            'userId',         // au lieu de 'user_id'
+            'roomId',         // au lieu de 'room_id'
+            'startTime',      // au lieu de 'start_time'
+            'endTime',        // au lieu de 'end_time'
             'status',
             'location',
-            'created_at'
+            'createdAt'       // au lieu de 'created_at'
         ];
 
-        // Convertir les réservations en lignes CSV
+        // Convertir les réservations en lignes CSV avec les clés camelCase
         const rows = reservations.map(reservation => [
-            reservation.id,
-            reservation.userId,
-            reservation.roomId,
+            reservation.id,                    // reservationId
+            reservation.userId,                // userId
+            reservation.roomId,                // roomId
             reservation.startTime instanceof Date
                 ? reservation.startTime.toISOString()
-                : reservation.startTime,
+                : reservation.startTime,       // startTime
             reservation.endTime instanceof Date
                 ? reservation.endTime.toISOString()
-                : reservation.endTime,
-            reservation.status,
-            reservation.location || '',
+                : reservation.endTime,         // endTime
+            reservation.status,                // status
+            reservation.location || '',       // location
             reservation.createdAt instanceof Date
                 ? reservation.createdAt.toISOString()
-                : reservation.createdAt
+                : reservation.createdAt        // createdAt
         ]);
 
         // Assembler le CSV
         const csvLines = [
-            headers.join(','), // Ligne d'en-têtes
+            headers.join(','), // Ligne d'en-têtes en camelCase
             ...rows.map(row => row.map(cell => `"${cell}"`).join(',')) // Lignes de données avec guillemets
         ];
 

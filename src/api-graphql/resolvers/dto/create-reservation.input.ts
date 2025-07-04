@@ -1,9 +1,9 @@
-import { InputType, Field, Int } from '@nestjs/graphql';
+import { InputType, Field, Int } from "@nestjs/graphql";
 
 @InputType()
 export class CreateReservationInput {
-  @Field(() => Int) userId: number;    // ← CHANGÉ en number avec Int
-  @Field(() => Int) roomId: number;    // ← CHANGÉ en number avec Int
-  @Field() startTime: string; // Garder en string pour GraphQL, convertir en Date dans le service
+  @Field(() => Int) userId: number;
+  @Field(() => Int) roomId: number;
+  @Field() startTime: string;
   @Field() endTime: string;
 }

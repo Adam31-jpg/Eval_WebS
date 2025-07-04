@@ -5,9 +5,8 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Param,
-  Patch,
-  Post,
+  Param, Post,
+  Put
 } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -28,6 +27,7 @@ export class ReservationController {
   })
   @ApiResponse({ status: 400, description: 'Requête invalide.' })
   create(@Body() reservation: ReservationEntity) {
+    console.log('reservation', reservation);
     return this.reservationService.create(reservation);
   }
 
@@ -55,7 +55,7 @@ export class ReservationController {
     return this.reservationService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   @ApiOperation({ summary: 'Mettre à jour une réservation' })
   @ApiParam({ name: 'id', description: 'ID de la réservation' })
   @ApiResponse({

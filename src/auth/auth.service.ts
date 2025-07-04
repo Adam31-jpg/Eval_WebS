@@ -29,7 +29,8 @@ export class AuthService {
                 email: userInfo.email,
                 keycloakId: userInfo.sub,
                 id: '',
-                createdAt: new Date(),
+                created_at: new Date(),
+                updated_at: new Date(),
               });
             }
             return of(user);

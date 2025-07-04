@@ -22,12 +22,24 @@ export class ExtractController {
 
         try {
             const url = await this.extractService.generateUserExtract(data.user_id);
-
             this.logger.log(`Extraction générée avec succès via gRPC pour l'utilisateur ${data.user_id}`);
-
             return { url };
         } catch (error) {
             this.logger.error(`Erreur lors de l'extraction gRPC pour l'utilisateur ${data.user_id}:`, error);
+            throw error;
+        }
+    }
+
+    @GrpcMethod('ExtractService', 'ExportReservations')
+    async exportReservations(data: { userId: number }): Promise<GenerateUserExtractResponse> {
+        this.logger.log(`Legacy export pour l'utilisateur ${data.userId}`);
+
+        try {
+            const url = await this.extractService.generateUserExtract(data.userId);
+            this.logger.log(`Export legacy généré avec succès pour l'utilisateur ${data.userId}`);
+            return { url };
+        } catch (error) {
+            this.logger.error(`Erreur lors de l'export legacy pour l'utilisateur ${data.userId}:`, error);
             throw error;
         }
     }
