@@ -31,4 +31,12 @@ export class ExtractClient implements OnModuleInit {
         this.logger.log(`Appel gRPC pour générer l'extraction de l'utilisateur ${userId}`);
         return this.extractService.GenerateUserExtract({ user_id: userId });
     }
+
+    ExportReservations(data: { userId: number }, callback: (err: any, response?: { url: string }) => void) {
+        this.logger.log(`Appel gRPC legacy pour l'extraction de l'utilisateur ${data.userId}`);
+        this.extractService.GenerateUserExtract({ user_id: data.userId }).subscribe({
+            next: (response) => callback(null, response),
+            error: (error) => callback(error)
+        });
+    }
 }

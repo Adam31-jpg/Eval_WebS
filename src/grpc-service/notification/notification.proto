@@ -16,9 +16,8 @@ message NotificationById {
   string id = 1;
 }
 
-
 message CreateNotificationRequest {
-  int32 reservationId = 1;
+  string reservationId = 1;
   string message = 2;
   string notificationDate = 3;
   bool isSent = 4;
@@ -31,7 +30,7 @@ message UpdateNotificationRequest {
 
 message Notification {
   string id = 1;
-  int32 reservationId = 2;
+  string reservationId = 2;
   string message = 3;
   string notificationDate = 4;
   bool isSent = 5;

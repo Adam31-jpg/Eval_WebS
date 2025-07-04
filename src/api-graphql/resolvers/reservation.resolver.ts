@@ -1,4 +1,3 @@
-// src/graphql/resolvers/reservation.resolver.ts
 import {
   Resolver,
   Query,
@@ -15,8 +14,8 @@ import { Observable, map, catchError, throwError } from 'rxjs';
 import { ReservationService } from '../services/reservation.service';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '../../auth/gq-auth.guard';
-import { CreateReservationInput } from './dto/create-reservation.input';
 import { UpdateReservationInput } from './dto/update-reservation.input';
+import { CreateReservationInput } from './dto/create-reservation.input';
 
 @ObjectType()
 export class ReservationType {
@@ -30,7 +29,6 @@ export class ReservationType {
   @Field({ nullable: true }) status?: string;
 }
 
-// CORRECTION: Fonction utilitaire pour formater les entités
 function formatReservationEntity(reservation: ReservationEntity): any {
   if (!reservation) return null;
 
@@ -104,7 +102,6 @@ export class ReservationResolver {
   ): Observable<any> {
     console.log(`➕ GraphQL createReservation appelé avec:`, input);
 
-    // CORRECTION: Validation des paramètres
     if (!input.userId || !input.roomId || !input.startTime || !input.endTime) {
       throw new Error('Tous les paramètres sont requis: userId, roomId, startTime, endTime');
     }
@@ -129,7 +126,6 @@ export class ReservationResolver {
   ): Observable<any> {
     console.log(`📝 GraphQL updateReservation appelé pour ID: ${id}`, input);
 
-    // CORRECTION: Validation de l'ID
     if (!id) {
       throw new Error('ID est requis pour la mise à jour');
     }
@@ -151,7 +147,6 @@ export class ReservationResolver {
   deleteReservation(@Args('id', { type: () => ID }) id: string): Observable<boolean> {
     console.log(`🗑️ GraphQL deleteReservation appelé pour ID: ${id}`);
 
-    // CORRECTION: Validation de l'ID
     if (!id) {
       throw new Error('ID est requis pour la suppression');
     }

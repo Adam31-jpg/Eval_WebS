@@ -1,4 +1,3 @@
-// src/graphql/services/reservation.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ReservationEntity } from '../../entities/reservation.entity';
 import { NotificationEntity } from '../../entities/notification.entity';
@@ -57,7 +56,6 @@ export class ReservationService {
   ): Observable<ReservationEntity> {
     console.log('📝 GraphQL: Création réservation avec:', reservationDto);
 
-    // CORRECTION: Validation des données d'entrée
     if (!reservationDto.userId || !reservationDto.roomId) {
       throw new Error('userId et roomId sont requis');
     }
@@ -65,27 +63,21 @@ export class ReservationService {
       throw new Error('startTime et endTime sont requis');
     }
 
-    // Convertir les strings en dates et créer la réservation
-    const reservation = {
+    const reservation = this.reservationRepository.create({
       userId: reservationDto.userId,
       roomId: reservationDto.roomId,
       startTime: new Date(reservationDto.startTime),
       endTime: new Date(reservationDto.endTime),
       location: 'GraphQL Created Location',
       status: StatusEnum.PENDING,
-    };
+    });
 
     console.log('💾 GraphQL: Réservation à sauvegarder:', reservation);
 
-    return from(
-      this.reservationRepository.save(
-        this.reservationRepository.create(reservation),
-      ),
-    ).pipe(
+    return from(this.reservationRepository.save(reservation)).pipe(
       switchMap((savedReservation) => {
         console.log('✅ GraphQL: Réservation sauvegardée:', savedReservation);
 
-        // CORRECTION: Créer la notification en base ET via gRPC
         const notificationEntity = this.notificationRepository.create({
           reservationId: parseInt(savedReservation.id),
           message: `Nouvelle réservation GraphQL créée pour la chambre ${savedReservation.roomId}`,
@@ -93,45 +85,8 @@ export class ReservationService {
           isSent: false,
         });
 
-        const saveNotification$ = from(this.notificationRepository.save(notificationEntity));
-
-        // Créer une notification via gRPC en parallèle
-        const notificationRequest = {
-          reservationId: parseInt(savedReservation.id),
-          message: `Nouvelle réservation GraphQL créée pour la chambre ${savedReservation.roomId}`,
-          notificationDate: new Date().toISOString(),
-          isSent: false,
-        };
-
-        // Appel gRPC asynchrone (ne pas bloquer si le service est indisponible)
-        try {
-          this.notificationClient.createNotification(notificationRequest).subscribe({
-            next: (result) => {
-              console.log('✅ Notification gRPC créée:', result);
-            },
-            error: (error) => {
-              console.error('❌ Erreur lors de la création de la notification gRPC:', error);
-            }
-          });
-        } catch (error) {
-          console.error('❌ Service gRPC indisponible:', error);
-        }
-
-        // Recharger avec les relations ET sauvegarder la notification
-        const reloadReservation$ = from(this.reservationRepository.findOne({
-          where: { id: savedReservation.id },
-          relations: ['user', 'room']
-        }));
-
-        return forkJoin([reloadReservation$, saveNotification$]).pipe(
-          map(([reservationWithRelations, notification]) => {
-            console.log('📋 GraphQL: Réservation avec relations:', reservationWithRelations);
-            console.log('📧 Notification sauvegardée:', notification);
-            if (!reservationWithRelations) {
-              throw new Error('Impossible de recharger la réservation avec ses relations');
-            }
-            return reservationWithRelations;
-          })
+        return from(this.notificationRepository.save(notificationEntity)).pipe(
+          map(() => savedReservation)
         );
       }),
       catchError((error) => {
@@ -151,7 +106,6 @@ export class ReservationService {
       switchMap((existingReservation) => {
         console.log('📋 GraphQL: Réservation existante:', existingReservation);
 
-        // Convertir les strings en dates si nécessaire et préparer les données de mise à jour
         const updateData: any = { ...existingReservation };
 
         if (input.userId !== undefined) updateData.userId = input.userId;
@@ -170,7 +124,6 @@ export class ReservationService {
       switchMap((updatedReservation) => {
         console.log('✅ GraphQL: Réservation mise à jour:', updatedReservation);
 
-        // Créer une notification de mise à jour en base
         const notificationEntity = this.notificationRepository.create({
           reservationId: parseInt(id),
           message: `Réservation GraphQL ${id} mise à jour`,
@@ -180,7 +133,6 @@ export class ReservationService {
 
         const saveNotification$ = from(this.notificationRepository.save(notificationEntity));
 
-        // Appel gRPC asynchrone
         try {
           const notificationRequest = {
             reservationId: parseInt(id),
@@ -201,7 +153,6 @@ export class ReservationService {
           console.error('❌ Service gRPC indisponible:', error);
         }
 
-        // Recharger avec les relations
         const reloadReservation$ = from(this.reservationRepository.findOne({
           where: { id: updatedReservation.id },
           relations: ['user', 'room']
@@ -237,13 +188,11 @@ export class ReservationService {
 
         console.log('🗑️ Suppression des notifications liées à la réservation:', id);
 
-        // Supprimer toutes les notifications liées à cette réservation
         return from(
           this.notificationRepository.delete({ reservationId: parseInt(id) })
         ).pipe(
           switchMap(() => {
             console.log('🗑️ Suppression de la réservation:', id);
-            // Puis supprimer la réservation
             return from(this.reservationRepository.delete(id));
           }),
           map((result) => {

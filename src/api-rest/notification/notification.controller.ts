@@ -81,37 +81,6 @@ export class NotificationController {
     return this.notificationService.remove(+id);
   }
 
-  // Méthodes gRPC
-  @GrpcMethod('NotificationService', 'Create')
-  grpcCreate(data: {
-    reservationId: number;
-    message: string;
-    notificationDate: string;
-    isSent: boolean;
-  }) {
-    try {
-      console.log('request', data);
-      const request = data;
-      // Vérifiez que toutes les propriétés nécessaires sont présentes
-      if (!request.reservationId || !request.message) {
-        throw new Error('reservationId et message sont requis');
-      }
-
-      const notification = new NotificationEntity();
-      notification.reservationId = request.reservationId;
-      notification.message = request.message;
-      notification.notificationDate = request.notificationDate
-        ? new Date(request.notificationDate)
-        : new Date();
-      notification.isSent =
-        request.isSent !== undefined ? request.isSent : false;
-
-      return this.notificationService.create(notification);
-    } catch (error) {
-      console.error('Erreur lors de la création de la notification:', error);
-      throw new Error('Erreur lors de la création de la notification');
-    }
-  }
   @GrpcMethod('NotificationService', 'FindAll')
   async grpcFindAll() {
     const notifications = await this.notificationService.findAll();
@@ -125,46 +94,49 @@ export class NotificationController {
     return { notifications: formattedNotifications };
   }
 
-  @GrpcMethod('NotificationService', 'FindOne')
-  async grpcFindOne(data: { id: string }) {
-    const notification = await this.notificationService.findOne(+data.id);
 
-    if (!notification) {
-      return null;
-    }
+  @GrpcMethod('NotificationService', 'CreateNotification')
+  async grpcCreateNotification(data: any) {
+    const saved = await this.notificationService.create(data);
 
-    // Formater les dates pour gRPC
     return {
-      ...notification,
-      notificationDate: notification.notificationDate?.toISOString(),
+      id: saved.id.toString(),
+      reservationId: saved.reservationId.toString(),
+      message: saved.message,
+      notificationDate: saved.notificationDate.toISOString(),
+      isSent: saved.isSent,
     };
   }
 
-  @GrpcMethod('NotificationService', 'Update')
-  async grpcUpdate(data: { id: string; notification: NotificationEntity }) {
-    // Convertir les chaînes en dates
-    if (
-      data.notification.notificationDate &&
-      typeof data.notification.notificationDate === 'string'
-    ) {
-      data.notification.notificationDate = new Date(
-        data.notification.notificationDate,
-      );
-    }
+  @GrpcMethod('NotificationService', 'GetNotification')
+  async grpcGetNotification(data: any) {
+    const notification = await this.notificationService.findOne(+data.id);
 
-    await this.notificationService.update(+data.id, data.notification);
-    const updatedNotification = await this.notificationService.findOne(
-      +data.id,
-    );
-
-    if (!updatedNotification) {
-      return null;
-    }
-
-    // Formater les dates pour gRPC
     return {
-      ...updatedNotification,
-      notificationDate: updatedNotification.notificationDate?.toISOString(),
+      id: (notification?.id ?? '').toString(),
+      reservationId: parseInt((notification?.reservationId ?? '0').toString()),
+      message: notification?.message ?? '',
+      notificationDate: notification?.notificationDate ? notification.notificationDate.toISOString() : null,
+      isSent: notification?.isSent ?? false,
+    };
+  }
+
+  @GrpcMethod('NotificationService', 'UpdateNotification')
+  async grpcUpdateNotification(data: any) {
+    await this.notificationService.update(+data.id, {
+      message: data.message,
+      notificationDate: new Date(data.notificationDate),
+      isSent: true,
+    } as any);
+
+    const updated = await this.notificationService.findOne(+data.id);
+
+    return {
+      id: updated?.id.toString(),
+      reservationId: parseInt((updated?.reservationId ?? '0').toString()),
+      message: updated?.message,
+      notificationDate: updated?.notificationDate.toISOString(),
+      isSent: updated?.isSent,
     };
   }
 
